@@ -64,7 +64,7 @@ A_buf = area(buffer_poly); A_pav = 2 / 3 * 11.5 * 5.2
 A_path = path_len * 2.5
 
 # ---- vẽ ----
-W, H = 1600, 960
+W, H = 1600, 1010
 o = []
 o.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
          'font-family="DejaVu Sans">')
@@ -91,6 +91,10 @@ x, y = p(38, -1.2)
 o.append(f'<text x="{x}" y="{y}" font-size="15" fill="#8a7f70" text-anchor="middle" transform="rotate(-9 {x} {y})">'
          'CÁC LÔ ĐẤT / CÔNG TRÌNH LÂN CẬN (hiện trạng cần xác nhận)</text>')
 
+# cây vỉa hè hiện hữu (giữ lại) dọc Ngô Thì Trí
+for yy in (2, 9, 16, 23, 30):
+    x, y = p(82.4, yy)
+    o.append(f'<circle cx="{x}" cy="{y}" r="{1.5*S}" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>')
 # nền khu đất
 o.append(f'<path d="{boundary}" fill="#e8f3df"/>')
 o.append(f'<polygon points="{pts(buffer_poly)}" fill="#cfe8b0" stroke="#8fbf6a" stroke-dasharray="4 3"/>')
@@ -110,6 +114,11 @@ o.append(f'<path d="{hull}" fill="#f4a261" stroke="#9c4a1a" stroke-width="2.5" s
 for k in (-3, -1, 1, 3):
     a, b = p(cx0 + k, cy0 - 2.3), p(cx0 + k, cy0 + 2.3)
     o.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{b[0]}" y2="{b[1]}" stroke="#9c4a1a" stroke-width="1.2" opacity=".6"/>')
+# Thuyền Ký Ức (thuyền gỗ cũ tái sử dụng làm bồn cây) ở Cổng Bến
+bx, by = 72.5, 36.6
+boat = f"M{p(bx-4,by)[0]},{p(bx-4,by)[1]} Q{p(bx,by-2.2)[0]},{p(bx,by-2.2)[1]} {p(bx+4,by)[0]},{p(bx+4,by)[1]} Q{p(bx,by+1.6)[0]},{p(bx,by+1.6)[1]} {p(bx-4,by)[0]},{p(bx-4,by)[1]}Z"
+o.append(f'<path d="{boat}" fill="#b5651d" stroke="#6b3a10" stroke-width="2"/>')
+o.append(f'<circle cx="{p(bx,by-0.2)[0]}" cy="{p(bx,by-0.2)[1]}" r="{0.8*S}" fill="#90be6d"/>')
 # thúng chai trong sân chơi
 for tx, ty in [(48.5, 34.5), (53.5, 32.5), (58, 36), (62.5, 33)]:
     x, y = p(tx, ty)
@@ -147,6 +156,7 @@ label("NHÀ THUYỀN\n(GĐ2)", 41.5, 19.0, 11)
 label("SÂN CHƠI THÚNG CHAI", 55.2, 30.9, 13)
 label("CỔNG BẾN", 73, 31.2, 13)
 label("Bảng ĐMST + bản đồ số", 73, 33.0, 10, "#333", "normal")
+label("Thuyền Ký Ức", 72.5, 39.6, 10, "#6b3a10")
 label("GÓC\nTHONG THẢ", 33, 32.0, 12)
 label("DẢI XANH THẤP + VƯỜN MƯA", 22, 12.2, 12, "#3a5a2a")
 # kích thước cạnh
@@ -166,7 +176,7 @@ o.append('<text x="40" y="80" font-size="17" fill="#444">Công viên Đổi mớ
 
 # chú giải
 LX, LY = 1245, 215
-o.append(f'<rect x="{LX-20}" y="{LY-40}" width="370" height="700" rx="10" fill="#fff" stroke="#ccc"/>')
+o.append(f'<rect x="{LX-20}" y="{LY-40}" width="370" height="770" rx="10" fill="#fff" stroke="#ccc"/>')
 o.append(f'<text x="{LX}" y="{LY-10}" font-size="19" font-weight="bold" fill="#0b3d2e">CHÚ GIẢI</text>')
 items = [
     ("#e0dcd3", "Cổng Bến (lùi khỏi góc giao lộ)", f"~{A_plaza:.0f} m²"),
@@ -190,6 +200,11 @@ o.append(f'<text x="{LX+36}" y="{y+18}" font-size="14" fill="#222">chỉ trồng
 y += 52
 o.append(f'<circle cx="{LX+13}" cy="{y-5}" r="12" fill="#2d6a4f"/>')
 o.append(f'<text x="{LX+36}" y="{y}" font-size="14" fill="#222">Cây bóng mát – bố trí phía mặt đường</text>')
+o.append(f'<circle cx="{LX+13}" cy="{y+29}" r="11" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>')
+o.append(f'<text x="{LX+36}" y="{y+34}" font-size="14" fill="#222">Cây vỉa hè hiện hữu – giữ lại</text>')
+o.append(f'<path d="M{LX+2},{y+64} Q{LX+13},{y+54} {LX+24},{y+64} Q{LX+13},{y+70} {LX+2},{y+64}Z" fill="#b5651d"/>')
+o.append(f'<text x="{LX+36}" y="{y+68}" font-size="14" fill="#222">Thuyền Ký Ức – thuyền gỗ cũ làm bồn cây</text>')
+y += 68
 y += 40
 o.append(f'<text x="{LX}" y="{y}" font-size="16" font-weight="bold" fill="#0077b6">HẢI TRÌNH STEM LÀNG CÁ</text>')
 y += 26

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960" font-family="DejaVu Sans">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1010" viewBox="0 0 1600 1010" font-family="DejaVu Sans">
 <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#c0392b" stroke-width="2" opacity=".55"/></pattern><pattern id="sand" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#b8860b" opacity=".5"/></pattern></defs>
-<rect width="1600" height="960" fill="#fbfaf6"/>
+<rect width="1600" height="1010" fill="#fbfaf6"/>
 <polygon points="480.0,779.2 1260.0,779.2 1260.0,883.2 480.0,883.2" fill="#d9d9d9"/>
 <text x="870" y="846.8000000000001" font-size="17" fill="#555" font-weight="bold" text-anchor="middle" transform="rotate(0 870 846.8000000000001)">ĐƯỜNG VŨNG THÙNG 4</text>
 <polygon points="1174.2,111.0 1278.2,111.0 1278.2,883.2 1174.2,883.2" fill="#d9d9d9"/>
@@ -9,6 +9,11 @@
 <text x="313.6" y="667.4" font-size="17" fill="#555" font-weight="bold" text-anchor="middle" transform="rotate(33.7 313.6 667.4)">ĐƯỜNG LÝ NHẬT QUANG</text>
 <polygon points="12.0,387.8 1144.6,211.1 1144.6,143.5 12.0,143.5" fill="#ece6dc"/>
 <text x="584" y="199.4" font-size="15" fill="#8a7f70" text-anchor="middle" transform="rotate(-9 584 199.4)">CÁC LÔ ĐẤT / CÔNG TRÌNH LÂN CẬN (hiện trạng cần xác nhận)</text>
+<circle cx="1161.2" cy="241" r="19.5" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>
+<circle cx="1161.2" cy="332" r="19.5" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>
+<circle cx="1161.2" cy="423" r="19.5" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>
+<circle cx="1161.2" cy="514" r="19.5" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>
+<circle cx="1161.2" cy="605" r="19.5" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>
 <path d="M90.0,381.27 L643.15,749.9499999999999 L1066.56,749.9499999999999 A78.0,78.0 0 0 0 1144.56,671.95 L1144.56,215.0 Z" fill="#e8f3df"/>
 <polygon points="90.0,381.3 1144.6,215.0 1144.6,269.6 194.0,419.5" fill="#cfe8b0" stroke="#8fbf6a" stroke-dasharray="4 3"/>
 <ellipse cx="493" cy="368.4" rx="52.0" ry="18.2" fill="#8ecae6" stroke="#219ebc" stroke-width="1.5"/>
@@ -24,6 +29,8 @@
 <line x1="616.5" y1="434.7" x2="616.5" y2="494.5" stroke="#9c4a1a" stroke-width="1.2" opacity=".6"/>
 <line x1="642.5" y1="434.7" x2="642.5" y2="494.5" stroke="#9c4a1a" stroke-width="1.2" opacity=".6"/>
 <line x1="668.5" y1="434.7" x2="668.5" y2="494.5" stroke="#9c4a1a" stroke-width="1.2" opacity=".6"/>
+<path d="M980.5,690.8 Q1032.5,662.2 1084.5,690.8 Q1032.5,711.6 980.5,690.8Z" fill="#b5651d" stroke="#6b3a10" stroke-width="2"/>
+<circle cx="1032.5" cy="688.2" r="10.4" fill="#90be6d"/>
 <circle cx="720.5" cy="663.5" r="16.900000000000002" fill="#a47148" stroke="#5e3b1e" stroke-width="2"/>
 <circle cx="720.5" cy="663.5" r="10.4" fill="#ffe08a"/>
 <circle cx="785.5" cy="637.5" r="16.900000000000002" fill="#a47148" stroke="#5e3b1e" stroke-width="2"/>
@@ -101,6 +108,7 @@
 <text x="807.6" y="616.7" font-size="13" font-weight="bold" fill="#222" text-anchor="middle">SÂN CHƠI THÚNG CHAI</text>
 <text x="1039" y="620.5999999999999" font-size="13" font-weight="bold" fill="#222" text-anchor="middle">CỔNG BẾN</text>
 <text x="1039" y="644.0" font-size="10" font-weight="normal" fill="#333" text-anchor="middle">Bảng ĐMST + bản đồ số</text>
+<text x="1032.5" y="729.8000000000001" font-size="10" font-weight="bold" fill="#6b3a10" text-anchor="middle">Thuyền Ký Ức</text>
 <text x="519" y="631.0" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">GÓC</text>
 <text x="519" y="646.0" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">THONG THẢ</text>
 <text x="376" y="373.6" font-size="12" font-weight="bold" fill="#3a5a2a" text-anchor="middle">DẢI XANH THẤP + VƯỜN MƯA</text>
@@ -110,7 +118,7 @@
 <text x="347.40000000000003" y="589.4000000000001" font-size="14" fill="#c0392b" font-weight="bold" text-anchor="middle" transform="rotate(33.7 347.40000000000003 589.4000000000001)">51,13 m</text>
 <text x="40" y="48" font-size="30" font-weight="bold" fill="#0b3d2e">BẾN SÁNG TẠO VŨNG THÙNG — SƠ ĐỒ MẶT BẰNG PHÂN KHU</text>
 <text x="40" y="80" font-size="17" fill="#444">Công viên Đổi mới Sáng tạo Sơn Trà · Khu đất góc Ngô Thì Trí – Vũng Thùng 4 – Lý Nhật Quang · S = 2.000 m² (theo BTC)</text>
-<rect x="1225" y="175" width="370" height="700" rx="10" fill="#fff" stroke="#ccc"/>
+<rect x="1225" y="175" width="370" height="770" rx="10" fill="#fff" stroke="#ccc"/>
 <text x="1245" y="205" font-size="19" font-weight="bold" fill="#0b3d2e">CHÚ GIẢI</text>
 <rect x="1245" y="222" width="26" height="20" fill="#e0dcd3" stroke="#666"/>
 <text x="1281" y="237" font-size="14" fill="#222">Cổng Bến (lùi khỏi góc giao lộ)</text>
@@ -140,29 +148,33 @@
 <text x="1281" y="527" font-size="14" fill="#222">chỉ trồng cỏ, cây bụi &lt; 0,6 m</text>
 <circle cx="1258" cy="556" r="12" fill="#2d6a4f"/>
 <text x="1281" y="561" font-size="14" fill="#222">Cây bóng mát – bố trí phía mặt đường</text>
-<text x="1245" y="601" font-size="16" font-weight="bold" fill="#0077b6">HẢI TRÌNH STEM LÀNG CÁ</text>
-<circle cx="1258" cy="622" r="11" fill="#0077b6"/>
-<text x="1258" y="627" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">1</text>
-<text x="1281" y="627" font-size="14" fill="#222">Vì sao thúng chai nổi?</text>
-<circle cx="1258" cy="650" r="11" fill="#0077b6"/>
-<text x="1258" y="655" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
-<text x="1281" y="655" font-size="14" fill="#222">Nút buộc của ngư dân</text>
-<circle cx="1258" cy="678" r="11" fill="#0077b6"/>
-<text x="1258" y="683" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">3</text>
-<text x="1281" y="683" font-size="14" fill="#222">Con nước và mặt trăng</text>
-<circle cx="1258" cy="706" r="11" fill="#0077b6"/>
-<text x="1258" y="711" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">4</text>
-<text x="1281" y="711" font-size="14" fill="#222">Nhìn sao đi biển → GPS</text>
-<circle cx="1258" cy="734" r="11" fill="#0077b6"/>
-<text x="1258" y="739" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">5</text>
-<text x="1281" y="739" font-size="14" fill="#222">Muối, cá và nước mắm</text>
-<circle cx="1258" cy="762" r="11" fill="#0077b6"/>
-<text x="1258" y="767" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">6</text>
-<text x="1281" y="767" font-size="14" fill="#222">Hành trình chai nhựa ra biển</text>
-<text x="1245" y="803" font-size="13" fill="#444">Mỗi trạm: biển thấp tầm trẻ em + chi tiết</text>
-<text x="1245" y="822" font-size="13" fill="#444">tương tác cơ học (không điện, không nước)</text>
-<text x="1245" y="841" font-size="13" fill="#444">+ mã QR mở nền tảng số “Bến Số”.</text>
+<circle cx="1258" cy="590" r="11" fill="none" stroke="#2d6a4f" stroke-width="2.5" stroke-dasharray="4 3"/>
+<text x="1281" y="595" font-size="14" fill="#222">Cây vỉa hè hiện hữu – giữ lại</text>
+<path d="M1247,625 Q1258,615 1269,625 Q1258,631 1247,625Z" fill="#b5651d"/>
+<text x="1281" y="629" font-size="14" fill="#222">Thuyền Ký Ức – thuyền gỗ cũ làm bồn cây</text>
+<text x="1245" y="669" font-size="16" font-weight="bold" fill="#0077b6">HẢI TRÌNH STEM LÀNG CÁ</text>
+<circle cx="1258" cy="690" r="11" fill="#0077b6"/>
+<text x="1258" y="695" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">1</text>
+<text x="1281" y="695" font-size="14" fill="#222">Vì sao thúng chai nổi?</text>
+<circle cx="1258" cy="718" r="11" fill="#0077b6"/>
+<text x="1258" y="723" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
+<text x="1281" y="723" font-size="14" fill="#222">Nút buộc của ngư dân</text>
+<circle cx="1258" cy="746" r="11" fill="#0077b6"/>
+<text x="1258" y="751" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">3</text>
+<text x="1281" y="751" font-size="14" fill="#222">Con nước và mặt trăng</text>
+<circle cx="1258" cy="774" r="11" fill="#0077b6"/>
+<text x="1258" y="779" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">4</text>
+<text x="1281" y="779" font-size="14" fill="#222">Nhìn sao đi biển → GPS</text>
+<circle cx="1258" cy="802" r="11" fill="#0077b6"/>
+<text x="1258" y="807" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">5</text>
+<text x="1281" y="807" font-size="14" fill="#222">Muối, cá và nước mắm</text>
+<circle cx="1258" cy="830" r="11" fill="#0077b6"/>
+<text x="1258" y="835" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">6</text>
+<text x="1281" y="835" font-size="14" fill="#222">Hành trình chai nhựa ra biển</text>
+<text x="1245" y="871" font-size="13" fill="#444">Mỗi trạm: biển thấp tầm trẻ em + chi tiết</text>
+<text x="1245" y="890" font-size="13" fill="#444">tương tác cơ học (không điện, không nước)</text>
+<text x="1245" y="909" font-size="13" fill="#444">+ mã QR mở nền tảng số “Bến Số”.</text>
 <rect x="90" y="826" width="130" height="8" fill="#333"/><rect x="220" y="826" width="130" height="8" fill="#fff" stroke="#333"/>
 <text x="90" y="852" font-size="13">0</text><text x="220" y="852" font-size="13" text-anchor="middle">10</text><text x="350" y="852" font-size="13" text-anchor="middle">20 m</text>
-<text x="40" y="938" font-size="13" fill="#666">Ghi chú: dựng theo số đo các cạnh do BTC cung cấp; sơ đồ BTC không theo tỉ lệ nên hình dạng có thể lệch nhẹ. Diện tích tính theo số đo cạnh ≈ 2.208 m². Sơ đồ ý tưởng, không phải bản vẽ kỹ thuật.</text>
+<text x="40" y="988" font-size="13" fill="#666">Ghi chú: dựng theo số đo các cạnh do BTC cung cấp; sơ đồ BTC không theo tỉ lệ nên hình dạng có thể lệch nhẹ. Diện tích tính theo số đo cạnh ≈ 2.208 m². Sơ đồ ý tưởng, không phải bản vẽ kỹ thuật.</text>
 </svg>

@@ -5,7 +5,7 @@ Mỗi ảnh chỉnh 3–5 lần là đẹp. Lưu ảnh dạng PNG/JPG, đặt t�
 
 ## Câu lệnh chung (dán TRƯỚC mỗi câu lệnh ảnh)
 
-> Đây là sơ đồ mặt bằng ý tưởng của một công viên nhỏ khoảng 2.000 m² trong khu dân cư làng chài ven biển Đà Nẵng, Việt Nam. Hãy vẽ ảnh phối cảnh kiến trúc chân thực, bố trí ĐÚNG theo sơ đồ (vị trí bãi cỏ, sân chơi, lối đi, cổng, hàng cây). Xung quanh là nhà phố 3–4 tầng kiểu Việt Nam, đường nhựa 2 làn có vỉa hè. Khí hậu nhiệt đới ven biển. KHÔNG vẽ hồ nước, đài phun nước, tượng lớn, nhà cao tầng hay biển quảng cáo; không có chữ, logo, thương hiệu.
+> Đây là sơ đồ mặt bằng ý tưởng của một công viên nhỏ khoảng 2.000 m² trong khu dân cư làng chài ven biển Đà Nẵng, Việt Nam. Hãy vẽ ảnh phối cảnh kiến trúc chân thực, bố trí ĐÚNG theo sơ đồ (vị trí bãi cỏ, sân chơi, lối đi, cổng, hàng cây). Xung quanh là nhà ở 2–4 tầng kiểu Việt Nam xen vài lô đất trống, xa xa có vài tòa nhà cao; đường nhựa 2 làn, vỉa hè lát gạch có hàng cây lớn gốc quét vôi trắng (giữ nguyên). Khí hậu nhiệt đới ven biển. KHÔNG vẽ hồ nước, đài phun nước, tượng lớn, nhà cao tầng hay biển quảng cáo; không có chữ, logo, thương hiệu.
 
 ## Ảnh 1 – Toàn cảnh (bắt buộc)
 
@@ -13,7 +13,7 @@ Mỗi ảnh chỉnh 3–5 lần là đẹp. Lưu ảnh dạng PNG/JPG, đặt t�
 
 ## Ảnh 2 – Cổng Bến nhìn từ ngã ba
 
-> Góc nhìn ngang tầm mắt người đi bộ, đứng ở vỉa hè ngã ba đường nhìn vào công viên. Góc giao lộ chỉ có cỏ và cây bụi thấp (dưới đầu gối) để thông thoáng tầm nhìn giao thông. Lùi vào trong vài mét là một quảng trường nhỏ lát gạch, có tấm bảng thông tin thấp bằng gỗ hình cánh buồm nhỏ, trên bảng có mã QR và bản đồ công viên (không cần chữ đọc được). Phía sau thấy bãi cỏ và giàn che mái cong hình thuyền úp.
+> Góc nhìn ngang tầm mắt người đi bộ, đứng ở vỉa hè ngã ba đường nhìn vào công viên. Góc giao lộ chỉ có cỏ và cây bụi thấp (dưới đầu gối) để thông thoáng tầm nhìn giao thông. Lùi vào trong vài mét là một quảng trường nhỏ lát gạch, có một chiếc thuyền gỗ cũ sơn đỏ nâu đã bạc màu được đặt trên nền làm bồn cây trồng hoa ("Thuyền Ký Ức"), bên cạnh là tấm bảng thông tin thấp bằng gỗ hình cánh buồm nhỏ, trên bảng có mã QR và bản đồ công viên (không cần chữ đọc được). Phía sau thấy bãi cỏ và giàn che mái cong hình thuyền úp.
 
 ## Ảnh 3 – Sân chơi Thúng Chai + trạm STEM
 
