@@ -4,6 +4,7 @@
 const STATIONS = [
   {
     id: 1,
+    en: {"title": "Why does a basket boat float?", "subject": "Physics · Archimedes' principle", "text": "The round bamboo basket boat (thúng chai) is an icon of Vietnam's central coast. Fishermen use it to go between big boats and the shore. It floats because water pushes up on any object with a force equal to the weight of the water it displaces. The wide, hollow basket displaces a lot of water while staying light — the same reason huge steel ships float."},
     icon: "🛶",
     title: "Vì sao thúng chai nổi?",
     subject: "Vật lý · Lực đẩy Archimedes",
@@ -25,6 +26,7 @@ const STATIONS = [
   },
   {
     id: 2,
+    en: {"title": "Fishermen's knots", "subject": "Engineering · Friction", "text": "Mooring a boat, joining nets, hauling an anchor — each job needs its own knot: tight under load, easy to untie. Knots hold thanks to friction. Every extra turn of rope around a post multiplies the holding force, so one person holding the rope end lightly can keep a whole boat in place. Try tying a bowline at the practice post!"},
     icon: "➰",
     title: "Nút buộc của ngư dân",
     subject: "Kỹ thuật · Ma sát",
@@ -46,6 +48,7 @@ const STATIONS = [
   },
   {
     id: 3,
+    en: {"title": "Tides and the Moon", "subject": "Physics · Tides", "text": "Fishermen read the tides to choose when to sail and when to land. Tides are mainly caused by the Moon's gravity, helped by the Sun. At new moon and full moon, Sun, Earth and Moon line up and the tides are strongest (spring tides); at half moon they are weaker (neap tides)."},
     icon: "🌕",
     title: "Con nước và mặt trăng",
     subject: "Vật lý · Thủy triều",
@@ -63,6 +66,7 @@ const STATIONS = [
   },
   {
     id: 4,
+    en: {"title": "From stars to GPS", "subject": "Astronomy · Navigation technology", "text": "Sailors once found their way by the stars. The Pole Star sits almost still above the North, and its height above the horizon is roughly your latitude — about 16° here in Da Nang, so it sits low. Today a GPS receiver listens to at least four satellites and uses the signal travel time to work out where you are."},
     icon: "🧭",
     title: "Nhìn sao đi biển – từ la bàn đến GPS",
     subject: "Thiên văn · Công nghệ định vị",
@@ -80,6 +84,7 @@ const STATIONS = [
   },
   {
     id: 5,
+    en: {"title": "Salt, fish and fish sauce", "subject": "Chemistry · Biology", "text": "Central Vietnam's coastal villages make fish sauce (nước mắm) by layering anchovies with salt and aging them for months. Salt draws water out of cells (osmosis), so spoilage bacteria cannot grow, while the fish's own enzymes slowly break proteins into amino acids — creating the rich, savoury flavour."},
     icon: "🐟",
     title: "Muối, cá và nước mắm",
     subject: "Hóa học · Sinh học",
@@ -101,6 +106,7 @@ const STATIONS = [
   },
   {
     id: 6,
+    en: {"title": "A plastic bottle's journey to the sea", "subject": "Environment · Waste sorting", "text": "A bottle dropped in the street can travel through drains and rivers to the sea, tangling nets and harming fish and turtles. Ordinary plastic does not rot; sunlight and waves break it into tiny microplastics that can last for centuries. Use less single-use plastic and sort your waste at the Gate."},
     icon: "🧴",
     title: "Hành trình chai nhựa ra biển",
     subject: "Môi trường · Phân loại rác",
@@ -165,3 +171,19 @@ const SPONSORS = [
   { item: "Biển 6 trạm Hải trình STEM", status: "Đang tìm người đỡ đầu" },
   { item: "Giàn che Nhà Thuyền (giai đoạn 2)", status: "Đang tìm người đỡ đầu" },
 ];
+
+// Gợi ý tiết học ngoài trời cho giáo viên (khoảng 60–75 phút, lớp 25–35 học sinh).
+const LESSON = {
+  fit: "Phù hợp học sinh tiểu học cuối cấp và THCS; giáo viên điều chỉnh độ sâu kiến thức theo lớp.",
+  steps: [
+    { time: "10 phút", title: "Tập trung tại Sân Bến", text: "Giới thiệu làng cá Vũng Thùng và luật chơi. Chia lớp thành 6 nhóm, mỗi nhóm một điện thoại (của giáo viên hoặc phụ huynh đi cùng) hoặc một phiếu học tập in sẵn." },
+    { time: "35–45 phút", title: "Xoay vòng 6 trạm", text: "Mỗi nhóm bắt đầu ở một trạm khác nhau để tránh dồn ứ, dừng 6–7 phút/trạm: đọc hoặc nghe nội dung, làm phần 'Thử ngay' tại trạm, ghi đáp án câu đố vào phiếu." },
+    { time: "10 phút", title: "Tổng kết tại Nhà Thuyền / Sân Bến", text: "Các nhóm chia sẻ một điều bất ngờ nhất. Giáo viên chốt: mỗi nghề truyền thống đều ẩn chứa khoa học. Nhóm đủ 6 huy hiệu nhận chứng nhận." },
+    { time: "Về nhà", title: "Thí nghiệm mở rộng", text: "Chọn một thí nghiệm 'Thử ngay' (thuyền giấy bạc, dưa leo và muối...) để làm ở nhà, chụp ảnh nộp lại cho giáo viên." },
+  ],
+  safety: [
+    "Tập trung và di chuyển bên trong công viên, không đứng ở góc giao lộ.",
+    "Học sinh không cần điện thoại riêng, không cần tài khoản; không thu thập thông tin học sinh.",
+    "Nên đăng ký trước với ban quản lý để tránh trùng lịch với lớp khác (đề xuất).",
+  ],
+};

@@ -29,24 +29,38 @@ boundary = (f"M{p(*A)[0]},{p(*A)[1]} L{p(*B)[0]},{p(*B)[1]} L{cx},{cy} "
 buffer_poly = [(x, top(x)) for x in (0, 81.12)] + [(81.12, 4.2), (6, top(6) + 4.2)]
 buffer_poly = [(0, 12.79), (81.12, 0), (81.12, 4.2), (8, top(8) + 4.2)]
 lawn = [(47, 10.2), (70, 6.8), (75.5, 12), (74.5, 24.5), (66, 26.3), (47, 25.8)]
-pavilion_c, pav_rx, pav_ry = (40.5, 18.5), 5.2, 3.4
+pavilion_c, pav_rx, pav_ry = (41.5, 19.2), 5.75, 2.6
 play = [(44.5, 29.5), (66, 29.5), (66, 39.2), (44.5, 39.2)]
 plaza = [(67.5, 28.5), (78.5, 28.5), (78.5, 35.3), (73.5, 39.2), (67.5, 39.2)]
 rest = [(17, 21.6), (30, 26.6), (42.5, 29.4), (42.5, 39.3), (30, 31.4), (17, 23.3)]
 sight = [(73.12, 41.15), (81.12, 33.15), (81.12, 41.15)]
-path_pts = [(16, 18.8), (30, 24.4), (44, 27.2), (66, 27.6), (76.5, 25.5), (77.5, 12),
-            (70.5, 5.6), (55, 7.9), (40, 11.0), (26, 14.3), (16, 18.8)]
-path_len = sum(math.dist(path_pts[i], path_pts[i + 1]) for i in range(len(path_pts) - 1))
+path_pts = [(35, 13.2), (50, 10.0), (68, 6.8), (76.6, 10.5), (77.4, 20), (74.5, 26.8), (60, 28.0),
+            (44, 27.8), (35.5, 25.2), (32.2, 19), (35, 13.2)]
+spur_pts = [(32.2, 19), (22, 19.4), (10.3, 19.65)]
+def smooth(ptsl, closed=True):
+    P = ptsl[:-1] if closed else ptsl
+    n = len(P); d = ""
+    for i in range(n if closed else n - 1):
+        p0 = P[(i - 1) % n] if closed or i > 0 else P[i]; p1 = P[i]; p2 = P[(i + 1) % n]
+        p3 = P[(i + 2) % n] if closed or i + 2 < n else P[i + 1]
+        c1 = (p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6)
+        c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
+        X = lambda q: f"{p(*q)[0]:.1f},{p(*q)[1]:.1f}"
+        if i == 0: d += f"M{X(p1)} "
+        d += f"C{X(c1)} {X(c2)} {X(p2)} "
+    return d + ("Z" if closed else "")
+path_len = sum(math.dist(path_pts[i], path_pts[i + 1]) for i in range(len(path_pts) - 1)) + \
+           sum(math.dist(spur_pts[i], spur_pts[i + 1]) for i in range(len(spur_pts) - 1))
 rain = [((31, 11.8), 4.0, 1.4), ((61, 5.4), 4.5, 1.2)]
-stations = [(1, (58, 29.0)), (2, (33.5, 26.6)), (3, (21, 18.8)), (4, (46, 8.1)),
-            (5, (72, 4.4)), (6, (79.2, 22))]
-trees = [(4 + i * 5.2, top(4 + i * 5.2) + 2.1) for i in range(15)] + \
-        [(79.3, 8), (79.3, 15), (8, 16.5), (45, 24), (66, 9.5), (48.5, 12.5),
-         (28, 21.6), (36.5, 31.5), (39.2, 36.8), (80.6, 29.8)]
+stations = [(1, (51, 27.9)), (2, (37.2, 28.2)), (3, (22, 17.2)), (4, (46, 8.6)),
+            (5, (70.5, 4.6)), (6, (79.6, 21))]
 
+trees = [(46, 38.2), (52, 38.2), (64.5, 38.2), (79.6, 25), (79.6, 17), (79.6, 9), (22, 26.2),
+         (26.5, 28.8), (40.5, 36.5), (45, 24), (66, 9.8), (48.5, 13), (74.3, 16), (29.5, 21.9)]
+shrubs = [(3 + i * 5.4, top(3 + i * 5.4) + 2.0) for i in range(15)]
 site_area = area([A, B, C, D]) - (R * R - math.pi * R * R / 4)
 A_lawn = area(lawn); A_play = area(play); A_plaza = area(plaza); A_rest = area(rest)
-A_buf = area(buffer_poly); A_pav = math.pi * pav_rx * pav_ry
+A_buf = area(buffer_poly); A_pav = 2 / 3 * 11.5 * 5.2
 A_path = path_len * 2.5
 
 # ---- vẽ ----
@@ -75,11 +89,11 @@ road([off(a0, 2.2), off(b0, 2.2), off(b0, 10.2), off(a0, 10.2)], "ĐƯỜNG LÝ 
 o.append(f'<polygon points="{pts([(-6,12.79+0.5),(81.12,-0.3),(81.12,-5.5),(-6,-5.5)])}" fill="#ece6dc"/>')
 x, y = p(38, -1.2)
 o.append(f'<text x="{x}" y="{y}" font-size="15" fill="#8a7f70" text-anchor="middle" transform="rotate(-9 {x} {y})">'
-         'NHÀ DÂN HIỆN HỮU (ranh giới giáp khu dân cư)</text>')
+         'CÁC LÔ ĐẤT / CÔNG TRÌNH LÂN CẬN (hiện trạng cần xác nhận)</text>')
 
 # nền khu đất
 o.append(f'<path d="{boundary}" fill="#e8f3df"/>')
-o.append(f'<polygon points="{pts(buffer_poly)}" fill="#7fb069" opacity=".75"/>')
+o.append(f'<polygon points="{pts(buffer_poly)}" fill="#cfe8b0" stroke="#8fbf6a" stroke-dasharray="4 3"/>')
 for (c, rx, ry) in rain:
     x, y = p(*c)
     o.append(f'<ellipse cx="{x}" cy="{y}" rx="{rx*S}" ry="{ry*S}" fill="#8ecae6" stroke="#219ebc" stroke-width="1.5"/>')
@@ -89,24 +103,32 @@ o.append(f'<polygon points="{pts(play)}" fill="#ffe8a3" stroke="#d4a017" stroke-
 o.append(f'<polygon points="{pts(play)}" fill="url(#sand)"/>')
 o.append(f'<polygon points="{pts(plaza)}" fill="#e0dcd3" stroke="#8d8577" stroke-width="1.5"/>')
 o.append(f'<polygon points="{pts(sight)}" fill="url(#hatch)"/>')
-x, y = p(*pavilion_c)
-o.append(f'<ellipse cx="{x}" cy="{y}" rx="{pav_rx*S}" ry="{pav_ry*S}" fill="#c9ada7" stroke="#6d4c41" stroke-width="2" stroke-dasharray="6 4"/>')
+cx0, cy0 = pavilion_c
+L, Wd = 11.5, 5.2
+hull = f"M{p(cx0-L/2, cy0)[0]},{p(cx0-L/2, cy0)[1]} Q{p(cx0, cy0-Wd)[0]},{p(cx0, cy0-Wd)[1]} {p(cx0+L/2, cy0)[0]},{p(cx0+L/2, cy0)[1]} Q{p(cx0, cy0+Wd)[0]},{p(cx0, cy0+Wd)[1]} {p(cx0-L/2, cy0)[0]},{p(cx0-L/2, cy0)[1]} Z"
+o.append(f'<path d="{hull}" fill="#f4a261" stroke="#9c4a1a" stroke-width="2.5" stroke-dasharray="7 4"/>')
+for k in (-3, -1, 1, 3):
+    a, b = p(cx0 + k, cy0 - 2.3), p(cx0 + k, cy0 + 2.3)
+    o.append(f'<line x1="{a[0]}" y1="{a[1]}" x2="{b[0]}" y2="{b[1]}" stroke="#9c4a1a" stroke-width="1.2" opacity=".6"/>')
 # thúng chai trong sân chơi
 for tx, ty in [(48.5, 34.5), (53.5, 32.5), (58, 36), (62.5, 33)]:
     x, y = p(tx, ty)
     o.append(f'<circle cx="{x}" cy="{y}" r="{1.3*S}" fill="#a47148" stroke="#5e3b1e" stroke-width="2"/>')
     o.append(f'<circle cx="{x}" cy="{y}" r="{0.8*S}" fill="#ffe08a"/>')
 # lối đi vòng
-o.append(f'<polyline points="{pts(path_pts)}" fill="none" stroke="#9c8c74" stroke-width="{2.5*S}" '
-         'stroke-linejoin="round" stroke-linecap="round" opacity=".8"/>')
-for q in [((68, 33.5), (69.5, 41.15)), ((79, 30.5), (81.12, 30.5)), ((42.5, 33.5), (40.8, 39.9)),
-          ((16, 18.8), (10.3, 19.6)), ((77.5, 14), (81.12, 14))]:
-    o.append(f'<polyline points="{pts(list(q))}" fill="none" stroke="#9c8c74" stroke-width="{2.2*S}" stroke-linecap="round" opacity=".8"/>')
+o.append(f'<path d="{smooth(path_pts)}" fill="none" stroke="#d8c7a3" stroke-width="{2.5*S}" stroke-linejoin="round"/>')
+o.append(f'<path d="{smooth(spur_pts, False)}" fill="none" stroke="#d8c7a3" stroke-width="{2.2*S}" stroke-linecap="round"/>')
+for q in [((70, 28), (70, 41.15)), ((75.5, 27), (79, 30.5), (81.12, 30.5)), ((40, 27), (41, 39.8)),
+          ((77.4, 14), (81.12, 14))]:
+    o.append(f'<polyline points="{pts(list(q))}" fill="none" stroke="#d8c7a3" stroke-width="{2.2*S}" stroke-linecap="round" stroke-linejoin="round"/>')
 # cây
 for tx, ty in trees:
     x, y = p(tx, ty)
     o.append(f'<circle cx="{x}" cy="{y}" r="{1.9*S}" fill="#2d6a4f" opacity=".85"/>')
     o.append(f'<circle cx="{x}" cy="{y}" r="3" fill="#1b4332"/>')
+for tx, ty in shrubs:
+    x, y = p(tx, ty)
+    o.append(f'<circle cx="{x}" cy="{y}" r="{0.9*S}" fill="#90be6d"/><circle cx="{x+9}" cy="{y+4}" r="{0.6*S}" fill="#f28482"/>')
 # trạm STEM
 for num, (sx, sy) in stations:
     x, y = p(sx, sy)
@@ -121,12 +143,12 @@ def label(txt, x, y, size=15, color="#222", w="bold"):
     for i, line in enumerate(txt.split("\n")):
         o.append(f'<text x="{X}" y="{Y + i*(size+3)}" font-size="{size}" font-weight="{w}" fill="{color}" text-anchor="middle">{line}</text>')
 label("SÂN BẾN\nbãi cỏ đa năng", 61, 16.5, 16)
-label("NHÀ THUYỀN\n(giai đoạn 2)", 40.5, 18.2, 12)
+label("NHÀ THUYỀN\n(GĐ2)", 41.5, 19.0, 11)
 label("SÂN CHƠI THÚNG CHAI", 55.2, 30.9, 13)
 label("CỔNG BẾN", 73, 31.2, 13)
 label("Bảng ĐMST + bản đồ số", 73, 33.0, 10, "#333", "normal")
-label("GÓC\nTHONG THẢ", 29.5, 29.2, 12)
-label("DẢI CÂY ĐỆM + VƯỜN MƯA", 44, 3.9, 13, "#fff")
+label("GÓC\nTHONG THẢ", 33, 32.0, 12)
+label("DẢI XANH THẤP + VƯỜN MƯA", 22, 12.2, 12, "#3a5a2a")
 # kích thước cạnh
 def dim(txt, x, y, rot):
     X, Y = p(x, y)
@@ -149,12 +171,12 @@ o.append(f'<text x="{LX}" y="{LY-10}" font-size="19" font-weight="bold" fill="#0
 items = [
     ("#e0dcd3", "Cổng Bến (lùi khỏi góc giao lộ)", f"~{A_plaza:.0f} m²"),
     ("#b5e48c", "Sân Bến – bãi cỏ đa năng", f"~{A_lawn:.0f} m²"),
-    ("#c9ada7", "Nhà Thuyền – giàn che (GĐ2)", f"~{A_pav:.0f} m²"),
+    ("#f4a261", "Nhà Thuyền – giàn che (GĐ2)", f"~{A_pav:.0f} m²"),
     ("#ffe8a3", "Sân chơi Thúng Chai", f"~{A_play:.0f} m²"),
     ("#f6d6a8", "Góc thong thả (thể dục, bàn cờ)", f"~{A_rest:.0f} m²"),
-    ("#7fb069", "Dải cây đệm giáp nhà dân", f"~{A_buf:.0f} m²"),
+    ("#cfe8b0", "Dải xanh thấp (bụi, hoa ≤ 2 m)", f"~{A_buf:.0f} m²"),
     ("#8ecae6", "Vườn mưa (thấm ≤ 48 giờ)", ""),
-    ("#9c8c74", f"Lối đi vòng Hải trình (~{path_len:.0f} m)", f"~{A_path:.0f} m²"),
+    ("#d8c7a3", f"Lối đi Hải trình (~{path_len:.0f} m)", f"~{A_path:.0f} m²"),
 ]
 y = LY + 22
 for col, name, ar in items:
@@ -167,7 +189,7 @@ o.append(f'<text x="{LX+36}" y="{y}" font-size="14" fill="#222">Tam giác tầm 
 o.append(f'<text x="{LX+36}" y="{y+18}" font-size="14" fill="#222">chỉ trồng cỏ, cây bụi &lt; 0,6 m</text>')
 y += 52
 o.append(f'<circle cx="{LX+13}" cy="{y-5}" r="12" fill="#2d6a4f"/>')
-o.append(f'<text x="{LX+36}" y="{y}" font-size="14" fill="#222">Cây bóng mát bản địa, chịu gió mặn</text>')
+o.append(f'<text x="{LX+36}" y="{y}" font-size="14" fill="#222">Cây bóng mát – bố trí phía mặt đường</text>')
 y += 40
 o.append(f'<text x="{LX}" y="{y}" font-size="16" font-weight="bold" fill="#0077b6">HẢI TRÌNH STEM LÀNG CÁ</text>')
 y += 26

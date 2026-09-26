@@ -9,7 +9,7 @@ Mỗi ảnh chỉnh 3–5 lần là đẹp. Lưu ảnh dạng PNG/JPG, đặt t�
 
 ## Ảnh 1 – Toàn cảnh (bắt buộc)
 
-> Góc nhìn chim bay 45° từ phía góc ngã ba đường (góc bo tròn ở dưới bên phải sơ đồ). Thấy: bãi cỏ đa năng lớn ở giữa có người dân tập thể dục và trẻ em chạy chơi; lối đi vòng lát sỏi màu nâu nhạt uốn quanh bãi cỏ; một giàn che nhẹ mái cong như chiếc thuyền úp ngược, làm bằng gỗ và tre; sân chơi trẻ em nền cát vàng có vài chiếc thúng chai tròn đan tre làm hố cát và bồn cây; hàng cây xanh rậm dọc ranh giới giáp nhà dân phía sau; góc có dụng cụ thể dục ngoài trời cho người lớn tuổi và bàn cờ. Nắng buổi sáng, không khí thân thiện.
+> Góc nhìn chim bay 45° từ phía góc ngã ba đường (góc bo tròn ở dưới bên phải sơ đồ). Thấy: bãi cỏ đa năng lớn ở giữa có người dân tập thể dục và trẻ em chạy chơi; lối đi vòng màu be nhạt bo tròn quanh bãi cỏ; một giàn che nhỏ hình thân thuyền úp ngược (thon hai đầu), làm bằng gỗ và tre; sân chơi trẻ em nền cát vàng có vài chiếc thúng chai tròn đan tre làm hố cát và bồn cây; dọc ranh giới phía sau chỉ có cây bụi và hoa thấp (dưới 2 m), không có cây cao; cây bóng mát lớn được trồng dọc vỉa hè phía mặt đường; góc có dụng cụ thể dục ngoài trời cho người lớn tuổi và bàn cờ. Nắng buổi sáng, không khí thân thiện.
 
 ## Ảnh 2 – Cổng Bến nhìn từ ngã ba
 
@@ -28,5 +28,6 @@ Mỗi ảnh chỉnh 3–5 lần là đẹp. Lưu ảnh dạng PNG/JPG, đặt t�
 - [ ] Không có hồ/đài phun nước, không có vũng nước đọng
 - [ ] Góc ngã ba thông thoáng, không có vật cao che tầm nhìn
 - [ ] Không có chữ lạ, logo, biển quảng cáo
-- [ ] Bố cục khớp sơ đồ (bãi cỏ giữa, sân chơi dọc đường Vũng Thùng 4, cây dọc nhà dân)
+- [ ] Bố cục khớp sơ đồ (bãi cỏ giữa, sân chơi dọc đường Vũng Thùng 4)
+- [ ] Ranh giới phía sau chỉ có cây thấp – KHÔNG có hàng cây cao che nắng
 - [ ] Ghi chú dưới ảnh trong thuyết minh: "Ảnh minh họa được tạo bằng công cụ AI"
