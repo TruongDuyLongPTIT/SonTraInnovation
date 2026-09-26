@@ -90,16 +90,15 @@ children.push(
   para("Theo hình ảnh đường phố công khai (Google Street View, chụp tháng 3/2021 – hiện trạng cần được cập nhật khi khảo sát), khu đất là bãi đất trống cỏ dại mọc cao; ven đường có vật liệu gỗ, ván thuyền cũ tập kết, rác thải và một số lều tạm; trên khu đất còn một chiếc thuyền gỗ cũ không sử dụng. Vỉa hè đường Ngô Thì Trí đã có hàng cây lớn cho bóng mát. Xung quanh chủ yếu là nhà ở thấp tầng xen các lô đất trống, gần cảng cá và bến neo đậu Vũng Thùng."),
   para([t("Vấn đề: ", { bold: true }), t("một khu đất 2.000 m² ngay giữa khu dân cư đang là điểm tập kết vật liệu và rác, không đem lại giá trị cho cộng đồng, trong khi khu phố thiếu chỗ vui chơi cho trẻ em, chỗ tập luyện cho người lớn tuổi và không gian sinh hoạt chung. Bến Sáng Tạo biến “khoảng đất bị bỏ quên” đó thành không gian của cả khu phố – và giữ lại chính những gì làm nên bản sắc của nó: hàng cây vỉa hè, chiếc thuyền gỗ cũ, câu chuyện làng cá.")]),
   h2("2.3. Ai sẽ đến Bến, và họ cần gì?"),
-  para("Khu đất nhỏ nhưng nằm ở vị trí giao thoa: giữa khu dân cư làng cá, gần bến neo đậu Vũng Thùng, cầu Thuận Phước, cảng Tiên Sa và các tuyến du lịch của bán đảo Sơn Trà. Vì vậy công viên cần phục vụ bốn nhóm người dùng, mỗi nhóm một nhu cầu khác nhau nhưng dùng chung một không gian:"),
+  para("Khu đất nhỏ nhưng nằm ở vị trí giao thoa: giữa khu dân cư làng cá, gần bến neo đậu Vũng Thùng, cầu Thuận Phước, cảng Tiên Sa và các tuyến du lịch của bán đảo Sơn Trà. Vì vậy công viên cần phục vụ ba nhóm người dùng, mỗi nhóm một nhu cầu khác nhau nhưng dùng chung một không gian:"),
   table([22, 38, 40], [
     ["Nhóm", "Nhu cầu", "Bến đáp ứng bằng"],
     ["Cư dân khu phố – trẻ em, người lớn tuổi, các gia đình (nhóm chính, dùng hằng ngày)", "Chỗ chơi an toàn cho trẻ gần nhà; chỗ đi bộ, tập thể dục, ngồi nghỉ có bóng mát; không gian sinh hoạt chung của khu phố.", "Sân chơi Thúng Chai nhìn thấy từ vỉa hè; lối đi vòng ~135 m; Góc thong thả; bãi cỏ Sân Bến cho sinh hoạt cộng đồng; Hòm ý tưởng để chính cư dân quyết định công viên thay đổi thế nào."],
     ["Giáo viên và học sinh các trường lân cận (theo đoàn, theo lịch)", "Địa điểm học ngoài lớp gần trường, an toàn, không tốn phí, có nội dung gắn với chương trình khoa học và giáo dục địa phương.", "Hải trình STEM 6 trạm; gợi ý tiết học 60–75 phút; phiếu học tập in sẵn; học sinh không cần điện thoại riêng hay tài khoản; nhóm đủ 6 huy hiệu nhận chứng nhận."],
     ["Du khách trong nước và quốc tế (ghé thăm theo tuyến khám phá làng biển)", "Trải nghiệm văn hóa làng biển chân thực, ngắn gọn, miễn phí; thông tin có tiếng Anh.", "Hành trình tự khám phá 20–30 phút; nội dung tiếng Anh cho 6 trạm; điểm check-in thúng chai; lời nhắc tôn trọng sự yên tĩnh của khu dân cư."],
-    ["Cộng đồng đổi mới sáng tạo – sinh viên, startup, các trường", "Nơi giới thiệu dự án, thử nghiệm ý tưởng với cộng đồng thật.", "Bảng Đổi mới Sơn Trà trưng bày luân phiên; workshop cuối tuần ở Nhà Thuyền; chiếu phim hoạt hình AI của cuộc thi SIF."],
   ]),
   para([t("Một buổi sáng ở Bến có thể trông như thế này: ", { bold: true, italics: true }), t("6 giờ, các cụ tập thể dục ở Góc thong thả; 9 giờ, cô giáo dẫn một lớp đến, chia 6 nhóm, mỗi nhóm bắt đầu ở một trạm – nhóm này cãi nhau vì sao thúng chai nổi, nhóm kia tập thắt nút ghế đơn; 10 giờ, một gia đình du khách đi hết hải trình bằng tiếng Anh rồi chụp ảnh bên thúng chai; chiều tối, trẻ em khu phố ra Sân chơi Thúng Chai, còn bố mẹ bình chọn ý tưởng “chiếu phim tối thứ Bảy” trên điện thoại.", { italics: true })]),
-  para("Điểm chung của cả bốn nhóm là bản sắc làng cá – thúng chai, bến thuyền, con nước, nghề nước mắm. Đây là “tài sản có sẵn” hiếm có, nhưng thế hệ trẻ ngày càng ít cơ hội tiếp xúc. Bến biến tài sản đó thành nội dung học tập và trải nghiệm, đúng tinh thần một “Công viên Đổi mới Sáng tạo”: đổi mới không phải bằng thiết bị đắt tiền, mà bằng cách làm mới cách cộng đồng học, chơi và cùng quyết định về không gian của mình."),
+  para("Điểm chung của cả ba nhóm là bản sắc làng cá – thúng chai, bến thuyền, con nước, nghề nước mắm. Đây là “tài sản có sẵn” hiếm có, nhưng thế hệ trẻ ngày càng ít cơ hội tiếp xúc. Bến biến tài sản đó thành nội dung học tập và trải nghiệm, đúng tinh thần một “Công viên Đổi mới Sáng tạo”: đổi mới không phải bằng thiết bị đắt tiền, mà bằng cách làm mới cách cộng đồng học, chơi và cùng quyết định về không gian của mình."),
   h2("2.4. Nguyên tắc thiết kế rút ra"),
   table([30, 70], [
     ["Nguyên tắc", "Cách thể hiện"],
@@ -190,7 +189,7 @@ children.push(
     ["Thời gian", "Hoạt động", "Đơn vị có thể tham gia (đề xuất)"],
     ["Sáng Chủ nhật hằng tuần", "Hải trình STEM cho thiếu nhi, lớp thắt nút, kể chuyện nghề biển", "Đoàn thanh niên, tình nguyện viên, trường học"],
     ["Tối thứ Bảy cuối tháng", "Chiếu phim hoạt hình (ưu tiên phim của cuộc thi “Làm phim hoạt hình bằng AI” – SIF), kết thúc trước 21:00", "UBND phường, Ban Tổ chức SIF"],
-    ["Hằng quý", "Làm mới “Bảng Đổi mới Sơn Trà”: dự án học sinh, sinh viên, startup", "Trường học, trung tâm hỗ trợ khởi nghiệp"],
+    ["Hằng quý", "Làm mới “Bảng Đổi mới Sơn Trà”: sản phẩm STEM, tranh vẽ của học sinh các trường lân cận, phim hoạt hình AI đoạt giải SIF, ảnh xưa do cư dân góp", "Trường học, UBND phường"],
     ["Hằng tháng", "“Cuối tuần xanh”: nhặt rác, phân loại rác, chăm cây", "Cộng đồng khu dân cư"],
     ["Hằng tháng", "Đọc báo cáo AI, chọn 1–3 việc cải tiến", "Tổ dân phố, ban quản lý công viên, UBND phường"],
   ]),
@@ -222,7 +221,7 @@ children.push(
   h1("8. Đáp ứng các nhóm nội dung của cuộc thi"),
   table([28, 72], [
     ["Nhóm nội dung", "Thể hiện trong ý tưởng"],
-    ["Công năng mới", "Học tập (Hải trình STEM), vui chơi, thể thao, đọc sách (kệ đổi sách), triển lãm – khởi nghiệp, khoa học công nghệ (Bảng Đổi mới Sơn Trà)."],
+    ["Công năng mới", "Học tập (Hải trình STEM), vui chơi, thể thao, đọc sách (kệ đổi sách), triển lãm khoa học – sáng tạo của học sinh (Bảng Đổi mới Sơn Trà)."],
     ["Hoạt động & trải nghiệm cộng đồng", "Hải trình Chủ nhật, chiếu phim cuối tháng, “Cuối tuần xanh”, kể chuyện nghề biển, hoạt động trẻ em."],
     ["Công viên xanh, sinh thái", "Dải xanh thấp, cây bóng mát bản địa, vườn mưa, lối đi thấm nước, đèn năng lượng mặt trời, phân loại rác, tái sử dụng thúng chai."],
     ["Công viên thông minh", "Bản đồ số, mã QR, ứng dụng số không cần cài đặt, AI tổng hợp dữ liệu góp ý, kết nối kênh phản ánh 1022."],
@@ -240,7 +239,7 @@ children.push(
     ["Gắn mã QR thông tin cho cây xanh, hiện vật, bảo tàng (cung cấp thông tin một chiều)", "QR là cửa vào một hành trình học tập có câu đố, huy hiệu, chứng nhận; nội dung là di sản nghề biển của chính khu dân cư, kể bằng ngôn ngữ khoa học."],
     ["Sân chơi, dụng cụ thể dục tiêu chuẩn", "Sân chơi mang bản sắc (thúng chai, lưới cá) nhưng dùng thiết bị đạt chuẩn an toàn; gắn với trạm STEM."],
     ["Hòm thư góp ý, kênh phản ánh sự cố", "Hòm ý tưởng để cùng thiết kế công viên, có bình chọn; AI tổng hợp thành báo cáo hành động hằng tháng; sự cố được chuyển về kênh 1022 sẵn có."],
-    ["Công viên thiết kế một lần rồi giữ nguyên", "Công viên được cải tiến liên tục theo ý kiến cộng đồng; nội dung được làm mới từ các cuộc thi, trường học, startup của địa phương."],
+    ["Công viên thiết kế một lần rồi giữ nguyên", "Công viên được cải tiến liên tục theo ý kiến cộng đồng; nội dung được làm mới từ các trường học, cuộc thi sáng tạo và ký ức do chính cư dân đóng góp."],
   ]),
 );
 
