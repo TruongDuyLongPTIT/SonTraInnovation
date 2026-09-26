@@ -4,15 +4,16 @@ Chạy lại với địa chỉ thật sau khi đưa web lên mạng:  python3 t
 import sys, os, qrcode
 BASE = (sys.argv[1] if len(sys.argv) > 1 else "https://truongduylongptit.github.io/SonTraInnovation/").rstrip("/") + "/"
 os.makedirs("qr", exist_ok=True)
-items = [("cong-ben", "Cổng Bến – Trang chủ Bến Số", "")] + \
-        [(f"tram-{i}", f"Trạm {i}", f"#/tram/{i}") for i in range(1, 7)]
+CODES = {1: "B7TC", 2: "K4ND", 3: "M9CN", 4: "S2GP", 5: "N5NM", 6: "R6CN"}  # khớp STATION_CODES trong season.js
+items = [("cong-ben", "Cổng Bến – Rương báu", "#/q/RUONG")] + \
+        [(f"tram-{i}", f"Trạm {i}", f"#/q/{CODES[i]}") for i in range(1, 7)]
 names = {1: "Vì sao thúng chai nổi?", 2: "Nút buộc của ngư dân", 3: "Con nước và mặt trăng",
          4: "Nhìn sao đi biển → GPS", 5: "Muối, cá và nước mắm", 6: "Hành trình chai nhựa ra biển"}
 cards = []
 for key, title, h in items:
     url = BASE + h
     qrcode.make(url, box_size=10, border=2).save(f"qr/{key}.png")
-    sub = names.get(int(key.split("-")[1]), "") if key.startswith("tram") else "Bản đồ, Hải trình, Hòm ý tưởng"
+    sub = (names[int(key.split("-")[1])] + " · mã " + CODES[int(key.split("-")[1])]) if key.startswith("tram") else "Mở rương khi đủ 6 mảnh · mã RUONG"
     cards.append(f'<div class="c"><img src="qr/{key}.png" alt="QR {title}"><b>{title}</b><span>{sub}</span><small>{url}</small></div>')
 open("qr.html", "w", encoding="utf-8").write(f"""<!doctype html><html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>Mã QR – Bến Số</title>

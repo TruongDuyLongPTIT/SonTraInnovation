@@ -1,6 +1,5 @@
-// Bến Số – ứng dụng một trang, định tuyến bằng hash (#/...), không cần máy chủ.
-// Không đăng nhập, không thu thập dữ liệu cá nhân: huy hiệu, ý tưởng, bình chọn và ngôn ngữ
-// chỉ lưu trên chính thiết bị (localStorage).
+// Bến Số – "Săn Kho Báu Vũng Thùng". Ứng dụng một trang, định tuyến bằng hash, không cần máy chủ.
+// Không đăng nhập, không thu thập dữ liệu cá nhân: mọi tiến độ chỉ lưu trên thiết bị (localStorage).
 
 const store = {
   get(key, fallback) {
@@ -23,14 +22,39 @@ const store = {
 const app = document.getElementById("app");
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const lang = () => store.get("lang", "vi");
+const SEASON = SEASONS.find((s) => s.active);
+const UNLOCK_MINUTES = 120; // quét mã xong phải giải trong 2 giờ, tránh "giải từ xa"
 
-function badges() { return store.get("badges", []); }
-function hasBadge(id) { return badges().includes(id); }
-function addBadge(id) {
-  const b = badges();
-  if (!b.includes(id)) { b.push(id); store.set("badges", b); }
+// ---------------- Trạng thái trò chơi ----------------
+
+function newSailorId() {
+  const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for (let i = 0; i < 4; i++) s += a[Math.floor(Math.random() * a.length)];
+  return "TT-" + s;
 }
+function game() {
+  const g = store.get("game", null) || {};
+  g.sailor = g.sailor || newSailorId();
+  g.points = g.points || 0;
+  g.solved = g.solved || {};   // "s1:1:ngày" -> true
+  g.letters = g.letters || {}; // "s1" -> {1:"N", ...}
+  g.hints = g.hints || {};     // "s1:1:ngày" -> true
+  g.unlocked = g.unlocked || {}; // trạm -> thời điểm quét
+  g.chest = g.chest || {};     // "s1" -> true
+  g.days = g.days || [];       // các ngày có chơi
+  return g;
+}
+function save(g) { store.set("game", g); }
+const today = () => Math.floor((Date.now() + 7 * 3600e3) / 86400e3); // ngày theo giờ Việt Nam
+const key = (st) => `${SEASON.id}:${st}:${today()}`;
+const letters = (g) => g.letters[SEASON.id] || {};
+const puzzleOf = (st) => { const pool = SEASON.puzzles[st]; return pool[(today() + st) % pool.length]; };
+const isUnlocked = (g, st) => g.unlocked[st] && Date.now() - g.unlocked[st] < UNLOCK_MINUTES * 60e3;
+const rankOf = (p) => [...RANKS].reverse().find((r) => p >= r.min);
+const nextRank = (p) => RANKS.find((r) => r.min > p);
+
+// ---------------- Hiệu ứng ----------------
 
 function toast(msg) {
   const t = document.createElement("div");
@@ -39,380 +63,673 @@ function toast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2600);
 }
-
-function confetti() {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const colors = ["#f07b54", "#1f8ac0", "#f5c54a", "#3a9d6a", "#7b5ea7"];
-  for (let i = 0; i < 36; i++) {
+function floatPts(n) {
+  const f = document.createElement("div");
+  f.className = "float-pts";
+  f.textContent = "+" + n;
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 1500);
+}
+function confetti(n = 40) {
+  const colors = ["#ffc94d", "#5ce1e6", "#ff7a59", "#3ddc84", "#ffffff"];
+  for (let i = 0; i < n; i++) {
     const c = document.createElement("i");
     c.className = "confetti";
     c.style.left = Math.random() * 100 + "vw";
     c.style.background = colors[i % colors.length];
-    c.style.animationDelay = Math.random() * 0.5 + "s";
+    c.style.animationDelay = Math.random() * 0.6 + "s";
     document.body.appendChild(c);
-    setTimeout(() => c.remove(), 2400);
+    setTimeout(() => c.remove(), 2600);
   }
 }
+function updatePill() {
+  const el = document.getElementById("pts");
+  if (el) el.textContent = game().points.toLocaleString("vi-VN");
+}
 
-const badgeRow = () =>
-  `<div class="badge-row">${STATIONS.map(
-    (s) => `<div class="badge ${hasBadge(s.id) ? "on" : ""}" title="${esc(s.title)}">${s.icon}</div>`
-  ).join("")}</div>`;
+// Biển đêm động trên hero: sóng, bọt nước và sao.
+let oceanRaf = null;
+function startOcean(canvas) {
+  cancelAnimationFrame(oceanRaf);
+  const ctx = canvas.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let W, H;
+  const resize = () => { W = canvas.clientWidth; H = canvas.clientHeight; canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+  resize();
+  const stars = Array.from({ length: 50 }, () => ({ x: Math.random(), y: Math.random() * 0.45, r: Math.random() * 1.3 + 0.3, p: Math.random() * 6 }));
+  const bubbles = Array.from({ length: 26 }, () => ({ x: Math.random(), y: 0.6 + Math.random() * 0.4, r: Math.random() * 2.5 + 1, v: Math.random() * 0.0015 + 0.0006 }));
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let t = 0;
+  const frame = () => {
+    if (!canvas.isConnected) return;
+    t += 0.016;
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#07203a"); g.addColorStop(0.55, "#0d3a60"); g.addColorStop(1, "#0f4d7a");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // mặt trăng
+    ctx.beginPath(); ctx.arc(W * 0.84, H * 0.16, 22, 0, Math.PI * 2); ctx.fillStyle = "rgba(255,236,190,.9)"; ctx.shadowColor = "#ffe9a8"; ctx.shadowBlur = 30; ctx.fill(); ctx.shadowBlur = 0;
+    stars.forEach((s) => { ctx.globalAlpha = 0.4 + 0.6 * Math.abs(Math.sin(t + s.p)); ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2); ctx.fill(); });
+    ctx.globalAlpha = 1;
+    // sóng
+    [[0.62, "rgba(31,138,192,.35)", 14, 0.8], [0.72, "rgba(19,89,139,.55)", 10, 1.2], [0.84, "rgba(6,26,46,.75)", 8, 1.6]].forEach(([y0, col, amp, sp]) => {
+      ctx.beginPath(); ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 8) ctx.lineTo(x, H * y0 + Math.sin(x / 60 + t * sp) * amp + Math.sin(x / 23 + t * sp * 1.7) * amp * 0.3);
+      ctx.lineTo(W, H); ctx.closePath(); ctx.fillStyle = col; ctx.fill();
+    });
+    // thúng chai bồng bềnh
+    const bx = W * 0.7, by = H * 0.62 + Math.sin(bx / 60 + t * 0.8) * 14 - 6;
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(Math.sin(t * 1.3) * 0.08);
+    ctx.fillStyle = "#6b3f19"; ctx.beginPath(); ctx.ellipse(0, 4, 26, 9, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#a8703c"; ctx.beginPath(); ctx.ellipse(0, 0, 24, 6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "#3b2408"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(8, -2); ctx.lineTo(26, -26); ctx.stroke();
+    ctx.restore();
+    // bọt nước
+    bubbles.forEach((b) => { b.y -= b.v; if (b.y < 0.58) b.y = 1; ctx.strokeStyle = "rgba(92,225,230,.5)"; ctx.beginPath(); ctx.arc(b.x * W, b.y * H, b.r, 0, Math.PI * 2); ctx.stroke(); });
+    if (!still) oceanRaf = requestAnimationFrame(frame);
+  };
+  window.addEventListener("resize", resize, { once: true });
+  frame();
+}
 
-// ---------------- Minh họa ----------------
+function typeLegend(el, text) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || store.get("legendSeen", false)) {
+    el.textContent = text; el.classList.add("done"); return;
+  }
+  let i = 0;
+  const tick = () => {
+    if (!el.isConnected) return;
+    el.textContent = text.slice(0, i); i += 2;
+    if (i <= text.length + 2) setTimeout(tick, 18); else { el.classList.add("done"); store.set("legendSeen", true); }
+  };
+  tick();
+}
 
-const HERO_SVG = `
-<svg viewBox="0 0 400 150" aria-hidden="true">
-  <circle cx="318" cy="40" r="26" fill="#ffe3a3" opacity=".95"/>
-  <path d="M0 70 L40 52 L78 64 L118 40 L160 58 L190 50 L220 66 L400 70 L400 150 L0 150Z" fill="#2f6f5e" opacity=".55"/>
-  <g class="wave2"><path d="M-30 86 Q10 78 50 86 T130 86 T210 86 T290 86 T370 86 T450 86 V150 H-30Z" fill="#2a7fb3"/></g>
-  <g class="bob" transform="translate(96 76)">
-    <ellipse cx="0" cy="8" rx="26" ry="9" fill="#7a4a24"/><ellipse cx="0" cy="5" rx="24" ry="6" fill="#a8703c"/>
-    <path d="M-20 5 Q0 -4 20 5" stroke="#5e3718" stroke-width="1.5" fill="none"/>
-    <line x1="10" y1="3" x2="30" y2="-20" stroke="#5e3718" stroke-width="2"/>
-  </g>
-  <g class="bob" transform="translate(250 84)" style="animation-delay:.8s">
-    <path d="M-40 0 H40 L30 14 H-30Z" fill="#e4572e"/><rect x="-14" y="-16" width="26" height="16" rx="2" fill="#fdf6e7"/>
-    <rect x="-8" y="-12" width="6" height="6" fill="#1f8ac0"/><rect x="2" y="-12" width="6" height="6" fill="#1f8ac0"/>
-    <line x1="18" y1="-2" x2="18" y2="-34" stroke="#3b3b3b" stroke-width="2"/><path d="M18 -34 L36 -26 L18 -20Z" fill="#f5c54a"/>
-  </g>
-  <g class="wave1"><path d="M-30 100 Q10 92 50 100 T130 100 T210 100 T290 100 T370 100 T450 100 V150 H-30Z" fill="#13598b"/></g>
-  <path d="M0 122 Q100 112 200 122 T400 120 V150 H0Z" fill="#fdf6e7"/>
-</svg>`;
+// ---------------- Hải đồ (bản đồ kho báu) ----------------
 
-// Bản đồ tương tác vẽ lại từ sơ đồ mặt bằng (tọa độ tính bằng mét, gốc tại đỉnh phía Lý Nhật Quang).
 const PIN_POS = { 1: [51, 27.9], 2: [37.2, 28.2], 3: [22, 17.2], 4: [46, 8.6], 5: [70.5, 4.6], 6: [79.6, 21] };
-function mapSvg() {
+const BOAT_PATH = "16,18.8 30,24.4 44,27.2 66,27.6 76.5,25.5 77.5,12 70.5,5.6 55,7.9 40,11 26,14.3 16,18.8";
+function hullPath(cx, cy, L, W) {
+  let d = "";
+  for (let i = 0; i <= 40; i++) { const u = -1 + i / 20; d += `${i ? "L" : "M"}${cx + (u * L) / 2},${cy - (W / 2) * (1 - u * u)} `; }
+  for (let i = 0; i <= 40; i++) { const u = 1 - i / 20; d += `L${cx + (u * L) / 2},${cy + (W / 2) * (1 - u * u)} `; }
+  return d + "Z";
+}
+function mapSvg(g) {
+  const L = letters(g);
   const pins = STATIONS.map((s) => {
     const [x, y] = PIN_POS[s.id];
-    const done = hasBadge(s.id);
-    return `<a href="#/tram/${s.id}" class="pin" aria-label="Trạm ${s.id}: ${esc(s.title)}">
-      <circle class="halo" cx="${x}" cy="${y}" r="2.6" fill="${done ? "#2b9348" : "#f07b54"}"/>
-      <circle cx="${x}" cy="${y}" r="2.6" fill="${done ? "#2b9348" : "#f07b54"}" stroke="#fff" stroke-width=".6"/>
-      <text x="${x}" y="${y + 1.1}" font-size="3" font-weight="800" fill="#fff" text-anchor="middle">${done ? "✓" : s.id}</text></a>`;
+    const got = L[s.id];
+    return `<g class="pin">
+      ${got ? "" : `<circle class="halo" cx="${x}" cy="${y}" r="2.7" fill="#e4572e"/>`}
+      <circle cx="${x}" cy="${y}" r="2.7" fill="${got ? "#ffc94d" : "#7a4a24"}" stroke="#3b2408" stroke-width=".5"/>
+      <text x="${x}" y="${y + 1.15}" font-size="3.1" font-weight="800" fill="${got ? "#3b2408" : "#fbf1dc"}" text-anchor="middle">${got || "?"}</text></g>`;
   }).join("");
+  const done = g.chest[SEASON.id];
   return `
-  <svg viewBox="-4 -3 92 50" role="img" aria-label="Bản đồ Bến Sáng Tạo Vũng Thùng">
-    <rect x="-4" y="43.2" width="96" height="6" fill="#e8e3d8"/><rect x="83.2" y="-3" width="6" height="52" fill="#e8e3d8"/>
-    <path d="M0 12.79 L42.55 41.15 L75.12 41.15 A6 6 0 0 0 81.12 35.15 L81.12 0Z" fill="#e7f2dc" stroke="#e4572e" stroke-width=".5"/>
-    <path d="M0 12.79 L81.12 0 L81.12 4.2 L8 15.83Z" fill="#cfe8b0"/>
-    <path d="M47 10.2 L70 6.8 L75.5 12 L74.5 24.5 L66 26.3 L47 25.8Z" fill="#b5e48c"/>
-    <path d="M17 21.6 L30 26.6 L42.5 29.4 L42.5 39.3 L30 31.4 L17 23.3Z" fill="#f6d6a8"/>
-    <rect x="44.5" y="29.5" width="21.5" height="9.7" fill="#ffe8a3"/>
-    <path d="M67.5 28.5 L78.5 28.5 L78.5 35.3 L73.5 39.2 L67.5 39.2Z" fill="#e0dcd3"/>
-    <path d="M35.75 19.2 Q41.5 14 47.25 19.2 Q41.5 24.4 35.75 19.2Z" fill="#f4a261"/>
-    <path d="M35 13.2 C40 11 45 11 50 10 C56 9 62 7.5 68 6.8 C72 6.2 76 8 76.6 10.5 C77.5 13 77.6 17 77.4 20 C77.2 23 76.5 26 74.5 26.8 C70 28 65 28 60 28 C55 28 49 28 44 27.8 C40 27.6 37 27 35.5 25.2 C33.5 23 32 21 32.2 19 C32.5 16.5 33.5 14 35 13.2Z" fill="none" stroke="#d8c7a3" stroke-width="2.4"/>
-    <path d="M32.2 19 L22 19.4 L10.3 19.65" stroke="#d8c7a3" stroke-width="2.1" fill="none" stroke-linecap="round"/>
-    ${[[48.5, 34.5], [53.5, 32.5], [58, 36], [62.5, 33]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.3" fill="#a47148"/><circle cx="${x}" cy="${y}" r=".8" fill="#ffe08a"/>`).join("")}
-    ${[[46, 38.2], [52, 38.2], [64.5, 38.2], [79.6, 25], [79.6, 17], [79.6, 9], [22, 26.2], [26.5, 28.8], [40.5, 36.5], [45, 24], [66, 9.8], [48.5, 13], [74.3, 16], [29.5, 21.9]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.7" fill="#2d6a4f" opacity=".85"/>`).join("")}
-    <text x="61" y="18" font-size="2.6" font-weight="700" fill="#2d4a22" text-anchor="middle">Sân Bến</text>
-    <text x="55" y="31.6" font-size="2" font-weight="700" fill="#7a5b00" text-anchor="middle">Sân chơi Thúng Chai</text>
-    <text x="73" y="32" font-size="2" font-weight="700" fill="#555" text-anchor="middle">Cổng Bến</text>
-    <text x="41.5" y="19.9" font-size="1.7" font-weight="700" fill="#7a3510" text-anchor="middle">Nhà Thuyền</text>
-    <text x="31" y="33.8" font-size="1.8" font-weight="700" fill="#8a5a1c" text-anchor="middle">Góc thong thả</text>
-    <text x="60" y="47.2" font-size="2" fill="#777" text-anchor="middle">Đường Vũng Thùng 4</text>
-    <text x="86.6" y="22" font-size="2" fill="#777" text-anchor="middle" transform="rotate(90 86.6 22)">Đường Ngô Thì Trí</text>
-    <text x="14" y="33" font-size="2" fill="#777" text-anchor="middle" transform="rotate(33.7 14 33)">Đường Lý Nhật Quang</text>
+  <svg viewBox="-4 -4 92 52" role="img" aria-label="Hải đồ Bến Sáng Tạo Vũng Thùng">
+    <defs><filter id="ink"><feTurbulence baseFrequency=".6" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale=".35"/></filter></defs>
+    <text x="0" y="-0.6" font-size="2.6" font-weight="800" fill="#5b3a12" letter-spacing=".3">HẢI ĐỒ LÃO NGƯ TƯ</text>
+    <g filter="url(#ink)" fill="none" stroke="#6d4c2a" stroke-width=".35">
+      <path d="M0 12.79 L42.55 41.15 L75.12 41.15 A6 6 0 0 0 81.12 35.15 L81.12 0Z" fill="rgba(122,160,90,.18)"/>
+    </g>
+    <path d="${hullPath(34, 19.8, 20, 7.5)}" fill="rgba(214,51,108,.18)" stroke="#8a4b2a" stroke-width=".35"/>
+    <path d="M47 10.2 L70 6.8 L75.5 12 L74.5 24.5 L66 26.3 L47 25.8Z" fill="rgba(122,160,90,.28)"/>
+    <rect x="44.5" y="29.5" width="21.5" height="9.7" fill="rgba(240,165,0,.18)" stroke="#b08a4a" stroke-width=".25"/>
+    <polyline points="${BOAT_PATH}" fill="none" stroke="#8a5a2b" stroke-width=".55" class="route"/>
+    <text x="34" y="20.6" font-size="1.9" fill="#8a1c47" text-anchor="middle" font-weight="700">Giàn Thuyền Hoa Giấy</text>
+    <text x="61" y="18" font-size="2.2" fill="#3b5a22" text-anchor="middle" font-weight="700">Sân Bến</text>
+    <text x="55" y="37" font-size="1.9" fill="#7a5b00" text-anchor="middle" font-weight="700">Sân chơi Thúng Chai</text>
+    <text x="59" y="47.4" font-size="2" fill="#6d5a3a" text-anchor="middle">Vũng Thùng 4</text>
+    <text x="86.4" y="21" font-size="2" fill="#6d5a3a" text-anchor="middle" transform="rotate(90 86.4 21)">Ngô Thì Trí</text>
+    <text x="16" y="32.5" font-size="2" fill="#6d5a3a" text-anchor="middle" transform="rotate(33.7 16 32.5)">Lý Nhật Quang</text>
+    <g class="chest-pin"><text x="73.5" y="36" font-size="6" text-anchor="middle">${done ? "💰" : "🧰"}</text></g>
+    <text x="73.5" y="39.2" font-size="1.8" fill="#5b3a12" text-anchor="middle" font-weight="800">RƯƠNG · CỔNG BẾN</text>
+    <g transform="translate(4 36)"><circle r="3.4" fill="none" stroke="#6d4c2a" stroke-width=".3"/><path d="M0 -3 L.8 0 L0 3 L-.8 0Z" fill="#8a1c47"/><text y="-3.8" font-size="1.8" text-anchor="middle" fill="#6d4c2a">N</text></g>
     ${pins}
   </svg>`;
 }
 
-// ---------------- Các trang ----------------
+function slots(g, animateId) {
+  const L = letters(g);
+  return `<div class="slots">${STATIONS.map((s) => `<div class="slot ${L[s.id] ? "on" : ""}" ${animateId === s.id ? "" : 'style="animation:none"'}>${L[s.id] || ""}</div>`).join("")}</div>`;
+}
+
+function seasonCountdown() {
+  const end = new Date("2026-11-01T00:00:00+07:00").getTime();
+  const ms = Math.max(0, end - Date.now());
+  const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), m = Math.floor((ms % 36e5) / 6e4);
+  return `<div class="countdown"><div><b>${d}</b><small>ngày</small></div><div><b>${h}</b><small>giờ</small></div><div><b>${m}</b><small>phút</small></div></div>`;
+}
+
+// ---------------- Trang chủ ----------------
 
 function pageHome() {
-  const n = badges().length;
+  const g = game();
+  const r = rankOf(g.points), nr = nextRank(g.points);
+  const n = Object.keys(letters(g)).length;
   return `
   <section class="hero">
-    <span class="eyebrow">Công viên Đổi mới Sáng tạo Sơn Trà</span>
-    <h1>Bến Sáng Tạo<br>Vũng Thùng</h1>
-    <p>Nơi nghề biển gặp công nghệ. Mỗi chiếc thúng chai, mỗi nút dây, mỗi con nước đều giấu một bí mật khoa học. Bạn đã sẵn sàng ra khơi?</p>
-    <div class="cta"><a class="btn" href="#/hai-trinh">🧭 Bắt đầu Hải trình</a><a class="btn light" href="#/y-tuong">💡 Góp ý tưởng</a></div>
-    ${HERO_SVG}
+    <canvas id="ocean" aria-hidden="true"></canvas>
+    <span class="eyebrow">Bến Sáng Tạo Vũng Thùng · ${esc(SEASON.name)}</span>
+    <h1><span class="glow-text">Săn Kho Báu<br>Vũng Thùng</span></h1>
+    <p class="legend" id="legend"></p>
+    <div class="cta"><a class="btn" href="#/quet">📷 Quét mã tại trạm</a><a class="btn ghost" href="#/hai-do">🗺️ Mở hải đồ</a></div>
   </section>
 
-  <a class="card stat-card" href="#/hai-trinh" style="text-decoration:none;color:inherit">
-    <div class="ring" style="--p:${(n / 6) * 100}"><span>${n}/6</span></div>
-    <div><b>${n === 6 ? "Bạn đã là Nhà Thám Hiểm Bến Sáng Tạo! 🏅" : n ? "Tiếp tục hải trình nhé!" : "Thu thập 6 huy hiệu làng biển"}</b>
-    <div class="muted" style="margin-top:4px">${badgeRow()}</div></div>
+  <a class="card sailor" href="#/the" style="text-decoration:none;color:inherit">
+    <div class="rank">${r.icon}</div>
+    <div style="flex:1">
+      <div class="muted" style="font-size:12px">Thẻ thủy thủ ${esc(g.sailor)}</div>
+      <b>${esc(r.name)}</b> · <span style="color:var(--gold);font-weight:800">${g.points} điểm</span>
+      <div class="bar"><i style="width:${nr ? Math.min(100, ((g.points - r.min) / (nr.min - r.min)) * 100) : 100}%"></i></div>
+      <div class="muted" style="font-size:12px;margin-top:3px">${nr ? `Còn ${nr.min - g.points} điểm để lên ${esc(nr.name)}` : "Cấp cao nhất!"}</div>
+    </div>
   </a>
 
-  <h2>Bạn đến Bến với tư cách…</h2>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><b>Mảnh hải đồ mùa này</b><span class="muted">${n}/6</span></div>
+    ${slots(g)}
+    <p class="muted" style="text-align:center;margin:4px 0 0">${n === 6 ? (g.chest[SEASON.id] ? "Bạn đã mở rương mùa này! 💰" : "Đủ 6 mảnh! Đến Cổng Bến để mở rương 🧰") : "Mỗi trạm giữ một chữ cái. Ghép đủ 6 chữ để mở rương báu."}</p>
+  </div>
+
+  <h2>Cách chơi</h2>
+  <div class="steps">
+    <div><b>🚶</b>Đi dọc lối đi hình con thuyền</div>
+    <div><b>📷</b>Quét mã QR ngay tại trạm</div>
+    <div><b>🧩</b>Giải câu đố, nhận mảnh hải đồ</div>
+    <div><b>🧰</b>Ghép mật mã, mở rương ở Cổng Bến</div>
+  </div>
+  <p class="muted">Câu đố <b>chỉ mở khi bạn đứng tại trạm và quét đúng mã</b> – không thể giải từ nhà.</p>
+
+  <h2>Kho báu không bao giờ cạn</h2>
+  <div class="card season-card gold">
+    <span class="tag">ĐANG DIỄN RA</span>
+    <h3 style="margin-top:8px">${esc(SEASON.name)}</h3>
+    <p class="muted" style="margin:0">Mỗi ngày mỗi trạm một câu đố khác · mùa mới với mật mã mới sau:</p>
+    ${seasonCountdown()}
+  </div>
+  <div class="seasons-row">
+    ${SEASONS.filter((s) => !s.active).map((s) => `
+      <div class="card season-card locked-season"><span class="tag soon">${esc(s.period)}</span><h3 style="margin-top:8px">${esc(s.name)}</h3><p class="muted" style="margin:0">${esc(s.teaser)}</p></div>`).join("")}
+  </div>
+  <a class="btn ghost small" href="#/mua">Vì sao trò chơi luôn mới? →</a>
+
+  <h2>Bạn là…</h2>
   <div class="audiences">
-    <a class="aud a1" href="#/hai-trinh"><span class="ic">🧒</span><b>Thám hiểm nhí</b><small>Giải đố 6 trạm, nhận huy hiệu và chứng nhận</small></a>
-    <a class="aud a2" href="#/giao-vien"><span class="ic">👩‍🏫</span><b>Thầy cô & lớp học</b><small>Tiết học ngoài trời 60 phút, phiếu học tập in sẵn</small></a>
-    <a class="aud a3" href="#/visitors"><span class="ic">🌏</span><b>Du khách · Visitors</b><small>Discover a fishing village through science (EN)</small></a>
-    <a class="aud a4" href="#/y-tuong"><span class="ic">🏘️</span><b>Cư dân khu phố</b><small>Đề xuất, bình chọn, cùng thiết kế công viên</small></a>
-  </div>
-
-  <h2>Bản đồ Bến</h2>
-  <div class="mapwrap">${mapSvg()}
-    <div class="legend-mini"><span><i style="background:#f07b54"></i>Trạm STEM – chạm để mở</span><span><i style="background:#b5e48c"></i>Bãi cỏ</span><span><i style="background:#ffe8a3"></i>Sân chơi</span><span><i style="background:#f4a261"></i>Nhà Thuyền</span></div>
-  </div>
-
-  <h2>6 trạm Hải trình STEM</h2>
-  <div class="scroller">${STATIONS.map((s) => `
-    <a class="scard c${s.id}" href="#/tram/${s.id}">
-      ${hasBadge(s.id) ? `<span class="done">✓ Đã xong</span>` : `<span class="n">0${s.id}</span>`}
-      <div class="big">${s.icon}</div><b>${esc(s.title)}</b><small>${esc(s.subject)}</small>
-    </a>`).join("")}
-  </div>
-
-  <h2>Tiện ích</h2>
-  <div class="card" style="padding:6px 14px">
-    <a class="list-station" style="box-shadow:none;margin:0" href="#/lich"><span class="ico" style="background:#1f8ac0">📅</span><span><b>Lịch hoạt động</b><small>Hải trình Chủ nhật, chiếu phim cuối tháng</small></span></a>
-    <a class="list-station" style="box-shadow:none;margin:0" href="#/do-dau"><span class="ico" style="background:#3a9d6a">🌳</span><span><b>Đỡ đầu cây xanh, thiết bị</b><small>Doanh nghiệp, gia đình cùng chăm Bến</small></span></a>
-    <a class="list-station" style="box-shadow:none;margin:0" href="#/su-co"><span class="ico" style="background:#e4572e">🛠️</span><span><b>Báo sự cố</b><small>Kết nối tổng đài 1022 của thành phố</small></span></a>
+    <a class="aud" href="#/giao-vien"><span>👩‍🏫</span>Thầy cô dẫn lớp</a>
+    <a class="aud" href="#/visitors"><span>🌏</span>Visitors (EN)</a>
+    <a class="aud" href="#/y-tuong"><span>🏘️</span>Cư dân góp ý</a>
   </div>`;
 }
-
-function stationList() {
-  return STATIONS.map((s) => `
-    <a class="list-station" href="#/tram/${s.id}">
-      <span class="ico c${s.id}">${s.icon}</span>
-      <span><b>${s.id}. ${esc(s.title)}</b><small>${esc(s.subject)}</small></span>
-      ${hasBadge(s.id) ? `<span class="tick">✓</span>` : ""}
-    </a>`).join("");
+function bindHome() {
+  const c = document.getElementById("ocean");
+  if (c) startOcean(c);
+  typeLegend(document.getElementById("legend"), LEGEND);
 }
 
-function pageTrail() {
-  const n = badges().length;
+// ---------------- Hải đồ ----------------
+
+function pageMap() {
+  const g = game();
+  const L = letters(g);
   return `
-  <h1>Hải trình STEM Làng Cá</h1>
-  <p>Sáu trạm dọc lối đi, mỗi trạm kể một nét của nghề biển và bí mật khoa học đằng sau. Trả lời đúng câu đố để nhận huy hiệu!</p>
-  <div class="card stat-card" style="margin-top:8px"><div class="ring" style="--p:${(n / 6) * 100}"><span>${n}/6</span></div><div>${badgeRow()}</div></div>
-  <div class="mapwrap">${mapSvg()}</div>
-  ${stationList()}
-  ${n === STATIONS.length ? `<a class="btn" href="#/chung-nhan">🏅 Xem giấy chứng nhận</a>` : ""}`;
+  <span class="eyebrow">${esc(SEASON.name)}</span>
+  <h1>Hải đồ kho báu</h1>
+  <p class="muted">Chấm “?” là trạm chưa giải. Đến tận nơi, tìm biển trạm có mã QR để mở câu đố.</p>
+  <div class="mapwrap">${mapSvg(g)}</div>
+  ${slots(g)}
+  <div class="st-list" style="margin-top:12px">
+    ${STATIONS.map((s) => `
+      <a class="st ${L[s.id] ? "solved" : ""}" href="#/tram/${s.id}">
+        <span class="ico">${s.icon}</span>
+        <span><b>Trạm ${s.id} · ${esc(s.title)}</b><small>${L[s.id] ? "Đã có mảnh hải đồ · xem nhật ký khoa học" : "🔒 Đến trạm và quét mã để mở"}</small></span>
+        ${L[s.id] ? `<span class="letter">${L[s.id]}</span>` : `<span class="lock">🔒</span>`}
+      </a>`).join("")}
+  </div>
+  ${Object.keys(L).length === 6 ? `<p style="margin-top:14px"><a class="btn" href="#/ruong">🧰 Đến Cổng Bến mở rương</a></p>` : ""}`;
 }
+
+// ---------------- Quét mã ----------------
+
+let scanStream = null;
+function stopScan() {
+  if (scanStream) { scanStream.getTracks().forEach((t) => t.stop()); scanStream = null; }
+}
+function pageScan() {
+  return `
+  <h1>Quét mã tại trạm</h1>
+  <p class="muted">Mỗi trạm có một biển gỗ với mã QR. Hãy đứng trước biển trạm và quét.</p>
+  <div class="scanner" id="scanner">
+    <div class="idle" id="scan-idle"><div><div style="font-size:48px">📷</div>Chạm “Bật camera” để quét,<br>hoặc dùng ứng dụng camera của điện thoại.</div></div>
+  </div>
+  <div class="row" style="justify-content:center"><button class="btn" id="cam">Bật camera</button></div>
+  <h2>Hoặc nhập mã in dưới QR</h2>
+  <form class="codebox" id="codeform"><input id="code" maxlength="6" placeholder="VD: B7TC" autocomplete="off"><button class="btn sea" type="submit">Mở</button></form>
+  <p class="muted" style="margin-top:14px">Ban giám khảo không ở công viên? Xem <a href="#/giam-khao">chế độ trình diễn</a>.</p>`;
+}
+function handleCode(raw) {
+  const code = String(raw || "").trim().toUpperCase().replace(/.*#\/Q\//, "");
+  if (code === CHEST_CODE) { location.hash = "#/q/" + CHEST_CODE; return true; }
+  if (STATION_CODES[code]) { location.hash = "#/q/" + code; return true; }
+  toast("Mã không đúng. Hãy kiểm tra lại mã in dưới QR.");
+  return false;
+}
+function bindScan() {
+  document.getElementById("codeform").addEventListener("submit", (e) => { e.preventDefault(); handleCode(document.getElementById("code").value); });
+  document.getElementById("cam").addEventListener("click", async () => {
+    if (!("BarcodeDetector" in window) || !navigator.mediaDevices) {
+      toast("Máy này chưa hỗ trợ quét trong trang – hãy dùng ứng dụng camera để quét mã QR.");
+      return;
+    }
+    try {
+      scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const box = document.getElementById("scanner");
+      box.innerHTML = `<video playsinline muted></video><div class="frame"></div><div class="laser"></div>`;
+      const video = box.querySelector("video");
+      video.srcObject = scanStream;
+      await video.play();
+      const det = new BarcodeDetector({ formats: ["qr_code"] });
+      const loop = async () => {
+        if (!scanStream || !video.isConnected) return stopScan();
+        try {
+          const r = await det.detect(video);
+          if (r.length) { stopScan(); if (!handleCode(r[0].rawValue)) setTimeout(route, 1500); return; }
+        } catch (e) { /* khung hình chưa sẵn sàng */ }
+        requestAnimationFrame(loop);
+      };
+      loop();
+    } catch (e) {
+      toast("Không mở được camera. Hãy cho phép quyền camera hoặc nhập mã bên dưới.");
+    }
+  });
+}
+
+// ---------------- Mở khóa trạm qua mã QR ----------------
+
+function resolveCode(code) {
+  code = (code || "").toUpperCase();
+  if (code === CHEST_CODE) { location.replace("#/ruong"); return; }
+  const st = STATION_CODES[code];
+  if (!st) { location.replace("#/quet"); toast("Mã không hợp lệ."); return; }
+  const g = game();
+  g.unlocked[st] = Date.now();
+  save(g);
+  store.set("justUnlocked", st);
+  location.replace("#/tram/" + st);
+}
+
+// ---------------- Trạm ----------------
 
 function pageStation(id) {
   const s = STATIONS.find((x) => x.id === id);
   if (!s) return pageNotFound();
-  if (lang() === "en") return pageStationEn(s);
-  const done = hasBadge(s.id);
-  const next = STATIONS.find((x) => x.id === id + 1);
+  const g = game();
+  const solvedToday = g.solved[key(id)];
+  const hasLetter = letters(g)[id];
+  if (!isUnlocked(g, id)) {
+    return `
+    <div class="card gate">
+      <div class="big">🔒</div>
+      <span class="eyebrow">Trạm ${id} · ${esc(s.title)}</span>
+      <h1>Câu đố đang bị khóa</h1>
+      <p>Câu đố chỉ mở khi bạn <b>đứng tại trạm ${id}</b> và quét mã QR trên biển trạm${solvedToday ? "" : ". Hôm nay trạm này có một câu đố mới đang chờ bạn!"}</p>
+      <div class="row" style="justify-content:center"><a class="btn" href="#/quet">📷 Quét mã</a><a class="btn ghost" href="#/hai-do">🗺️ Xem hải đồ</a></div>
+    </div>
+    ${hasLetter ? scienceCard(s) : ""}`;
+  }
+  const just = store.get("justUnlocked", 0) === id;
+  if (just) store.set("justUnlocked", 0);
+  const p = puzzleOf(id);
+  const typeName = { choice: "CÂU ĐỐ CHỌN ĐÁP ÁN", code: "Ổ KHÓA SỐ", order: "MẢNH GIẤY BỊ XÉ" }[p.type];
+  const usedHint = g.hints[key(id)];
   return `
-  <section class="shead c${s.id}">
-    <a href="#/hai-trinh">← Hải trình</a> · Trạm ${s.id}/6
-    <div class="big" style="margin-top:12px">${s.icon}</div>
-    <h1>${esc(s.title)}</h1>
-    <div class="sub">${esc(s.subject)}</div>
-    <div class="row" style="margin-top:12px"><button class="btn light small" id="speak">🔊 Nghe đọc</button></div>
-  </section>
-
-  <div class="card"><h3 class="section-title"><span>⚓</span>Chuyện làng biển</h3><p>${esc(s.story)}</p></div>
-  <div class="card"><h3 class="section-title"><span>🔬</span>Khoa học ở đây</h3><p>${esc(s.science)}</p></div>
-  <div class="card"><h3 class="section-title"><span>✋</span>Thử ngay</h3><p>${esc(s.tryit)}</p></div>
-
-  <div class="card" id="quiz">
-    <h3 class="section-title"><span>❓</span>Câu đố nhận huy hiệu</h3>
-    <p><b>${esc(s.quiz.q)}</b></p>
-    ${s.quiz.options.map((o, i) => `<button class="opt" data-i="${i}">${String.fromCharCode(65 + i)}. ${esc(o)}</button>`).join("")}
-    <p id="quiz-msg" class="muted">${done ? "Bạn đã có huy hiệu trạm này rồi. Có thể trả lời lại cho vui!" : ""}</p>
+  ${just ? `<div class="unlock-anim"><span class="compass">🧭</span><div class="eyebrow" style="margin-top:6px">Đã tìm thấy trạm ${id}!</div></div>` : ""}
+  <p class="muted" style="margin-top:14px"><a href="#/hai-do">← Hải đồ</a> · Trạm ${id}/6 · ${s.icon} ${esc(s.title)}</p>
+  <div class="parch" id="puzzle">
+    <span class="puzzle-type">${typeName}</span>
+    <h3 style="margin-top:10px;font-size:17px">${esc(p.q)}</h3>
+    ${solvedToday ? `<p class="muted">✅ Bạn đã giải câu đố hôm nay. Ngày mai trạm này sẽ có câu đố mới!</p>` : puzzleBody(p)}
+    ${!solvedToday ? `<div id="hintbox">${usedHint ? `<div class="hint">💡 ${esc(p.hint)}</div>` : `<button class="btn ghost small" id="hint" style="color:#5b3a12;border-color:#b08a4a;margin-top:10px">💡 Gợi ý (−${POINTS.hintCost} điểm)</button>`}</div>` : ""}
+    <p id="msg" class="muted" style="margin:10px 0 0"></p>
   </div>
-  <div class="row">
-    ${next ? `<a class="btn" href="#/tram/${next.id}">Trạm tiếp theo →</a>` : `<a class="btn" href="#/hai-trinh">Về Hải trình</a>`}
-  </div>`;
+  <div id="after">${solvedToday ? rewardBlock(s, g, false) : ""}</div>`;
 }
 
-function pageStationEn(s) {
-  const next = STATIONS.find((x) => x.id === s.id + 1);
+function puzzleBody(p) {
+  if (p.type === "choice") return p.options.map((o, i) => `<button class="opt" data-i="${i}">${String.fromCharCode(65 + i)}. ${esc(o)}</button>`).join("");
+  if (p.type === "code") {
+    return `<div class="lock-dials">${Array.from({ length: p.digits }, (_, i) => `
+      <div class="dial"><button data-d="${i}" data-s="1">▲</button><div class="num" id="d${i}">0</div><button data-d="${i}" data-s="-1">▼</button></div>`).join("")}</div>
+      <div class="row" style="justify-content:center"><button class="btn" id="try">🔓 Mở khóa</button></div>`;
+  }
+  const shuffled = p.items.map((t, i) => ({ t, i })).sort(() => Math.random() - 0.5);
+  return `<p class="muted">Chạm lần lượt theo đúng thứ tự:</p>
+    <div class="order-picked" id="picked"></div>
+    <div class="order-pool" id="pool">${shuffled.map((x) => `<button class="chipbtn" data-i="${x.i}">${esc(x.t)}</button>`).join("")}</div>
+    <div class="row"><button class="btn small" id="check" disabled>Kiểm tra</button><button class="btn ghost small" id="reset" style="color:#5b3a12;border-color:#b08a4a">Làm lại</button></div>`;
+}
+
+function scienceCard(s) {
+  return `<div class="card science"><h3>📖 Nhật ký khoa học · ${esc(s.title)}</h3><p>${esc(s.science)}</p><p class="muted">✋ Thử ngay: ${esc(s.tryit)}</p>
+    <div class="row"><button class="btn ghost small" id="speak">🔊 Nghe đọc</button></div></div>`;
+}
+
+function rewardBlock(s, g, fresh) {
+  const letter = letters(g)[s.id];
+  const all = Object.keys(letters(g)).length === 6;
   return `
-  <section class="shead c${s.id}">
-    <a href="#/visitors">← Visitors</a> · Station ${s.id}/6
-    <div class="big" style="margin-top:12px">${s.icon}</div>
-    <h1>${esc(s.en.title)}</h1><div class="sub">${esc(s.en.subject)}</div>
-  </section>
-  <div class="card"><p>${esc(s.en.text)}</p></div>
-  <p class="muted">The quiz and badges are available in Vietnamese — switch to VI at the top.</p>
-  <div class="row">${next ? `<a class="btn" href="#/tram/${next.id}">Next station →</a>` : `<a class="btn" href="#/visitors">Back</a>`}</div>`;
+  <div class="card reward gold">
+    <div class="eyebrow">${fresh ? "Giải đúng!" : "Mảnh hải đồ của trạm"}</div>
+    <div class="fragment">${letter}</div>
+    <p>${all ? "Đủ 6 mảnh! Mang mật mã đến <b>Cổng Bến</b> và quét mã rương." : "Mảnh hải đồ đã được thêm vào bộ sưu tập."}</p>
+    ${slots(g, fresh ? s.id : 0)}
+    <div class="row" style="justify-content:center">${all && !g.chest[SEASON.id] ? `<a class="btn" href="#/ruong">🧰 Mở rương</a>` : `<a class="btn" href="#/hai-do">🗺️ Trạm tiếp theo</a>`}</div>
+  </div>
+  ${scienceCard(s)}`;
 }
 
-function bindStation(id) {
+function solve(id) {
+  const g = game();
+  const k = key(id);
+  if (g.solved[k]) return;
+  g.solved[k] = true;
+  let pts = POINTS.solve + (g.hints[k] ? 0 : POINTS.noHint);
+  const d = today();
+  if (g.days.length && !g.days.includes(d)) pts += POINTS.dailyReturn;
+  if (!g.days.includes(d)) g.days.push(d);
+  g.letters[SEASON.id] = g.letters[SEASON.id] || {};
+  const fresh = !g.letters[SEASON.id][id];
+  g.letters[SEASON.id][id] = SEASON.letters[id];
+  g.points += pts;
+  save(g);
+  floatPts(pts);
+  confetti();
+  updatePill();
   const s = STATIONS.find((x) => x.id === id);
-  if (!s || lang() === "en") return;
-  document.querySelectorAll(".opt").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const i = Number(btn.dataset.i);
-      document.querySelectorAll(".opt").forEach((b) => b.classList.remove("right", "wrong"));
-      const msg = document.getElementById("quiz-msg");
-      if (i === s.quiz.answer) {
-        btn.classList.add("right");
-        const had = hasBadge(s.id);
-        addBadge(s.id);
-        msg.textContent = had ? "Chính xác!" : `Chính xác! Bạn nhận huy hiệu ${s.icon} (${badges().length}/6).`;
-        if (!had) { toast(`🎉 Nhận huy hiệu ${s.icon}!`); confetti(); }
-        if (!had && badges().length === STATIONS.length) setTimeout(() => (location.hash = "#/chung-nhan"), 1400);
-      } else {
-        btn.classList.add("wrong");
-        msg.textContent = "Chưa đúng rồi, đọc lại phần 'Khoa học ở đây' và thử lại nhé!";
-      }
-    });
-  });
+  document.getElementById("after").innerHTML = rewardBlock(s, g, fresh);
+  document.querySelectorAll("#hintbox").forEach((h) => (h.style.display = "none"));
+  bindSpeak(s);
+  setTimeout(() => document.getElementById("after").scrollIntoView({ behavior: "smooth", block: "start" }), 250);
+}
+
+function bindSpeak(s) {
   const sp = document.getElementById("speak");
+  if (!sp) return;
   if (!("speechSynthesis" in window)) { sp.style.display = "none"; return; }
   sp.addEventListener("click", () => {
     if (speechSynthesis.speaking) { speechSynthesis.cancel(); sp.textContent = "🔊 Nghe đọc"; return; }
-    const u = new SpeechSynthesisUtterance(`${s.title}. ${s.story} ${s.science}`);
+    const u = new SpeechSynthesisUtterance(`${s.title}. ${s.science}`);
     u.lang = "vi-VN";
     const v = speechSynthesis.getVoices().find((x) => x.lang && x.lang.toLowerCase().startsWith("vi"));
     if (v) u.voice = v;
     u.onend = () => (sp.textContent = "🔊 Nghe đọc");
     speechSynthesis.speak(u);
-    sp.textContent = "⏹ Dừng đọc";
+    sp.textContent = "⏹ Dừng";
   });
 }
 
-function pageCert() {
-  if (badges().length < STATIONS.length) {
-    return `<h1>Giấy chứng nhận</h1><p>Hoàn thành cả 6 trạm để nhận giấy chứng nhận.</p>
-      <div class="card">${badgeRow()}</div><a class="btn" href="#/hai-trinh">Tiếp tục Hải trình</a>`;
+function bindStation(id) {
+  const s = STATIONS.find((x) => x.id === id);
+  if (!s) return;
+  bindSpeak(s);
+  const g = game();
+  if (!isUnlocked(g, id) || g.solved[key(id)]) return;
+  const p = puzzleOf(id);
+  const msg = document.getElementById("msg");
+  const wrong = (t) => { msg.textContent = t || "Chưa đúng! Thử lại nhé – hoặc dùng gợi ý."; };
+  const hb = document.getElementById("hint");
+  if (hb) hb.addEventListener("click", () => {
+    const g2 = game();
+    g2.hints[key(id)] = true;
+    g2.points = Math.max(0, g2.points - POINTS.hintCost);
+    save(g2); updatePill();
+    document.getElementById("hintbox").innerHTML = `<div class="hint">💡 ${esc(p.hint)}</div>`;
+  });
+  if (p.type === "choice") {
+    document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+      document.querySelectorAll(".opt").forEach((x) => x.classList.remove("wrong"));
+      if (Number(b.dataset.i) === p.answer) { b.classList.add("right"); solve(id); }
+      else { b.classList.add("wrong"); wrong(); }
+    }));
+  } else if (p.type === "code") {
+    const vals = Array(p.digits).fill(0);
+    document.querySelectorAll(".dial button").forEach((b) => b.addEventListener("click", () => {
+      const i = Number(b.dataset.d);
+      vals[i] = (vals[i] + Number(b.dataset.s) + 10) % 10;
+      document.getElementById("d" + i).textContent = vals[i];
+    }));
+    document.getElementById("try").addEventListener("click", () => {
+      const v = vals.join("").replace(/^0+(?=\d)/, "");
+      if (p.answer.includes(v)) { document.querySelector(".lock-dials").style.filter = "drop-shadow(0 0 12px #3ddc84)"; solve(id); }
+      else { document.querySelector(".lock-dials").animate([{ transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "none" }], 300); wrong("Ổ khóa không mở… Tính lại xem!"); }
+    });
+  } else {
+    const picked = [];
+    const draw = () => {
+      document.getElementById("picked").innerHTML = picked.map((i, n) => `<div class="chipbtn picked"><span class="n">${n + 1}</span>${esc(p.items[i])}</div>`).join("");
+      document.querySelectorAll("#pool .chipbtn").forEach((b) => (b.style.display = picked.includes(Number(b.dataset.i)) ? "none" : ""));
+      document.getElementById("check").disabled = picked.length !== p.items.length;
+    };
+    document.querySelectorAll("#pool .chipbtn").forEach((b) => b.addEventListener("click", () => { picked.push(Number(b.dataset.i)); draw(); }));
+    document.getElementById("reset").addEventListener("click", () => { picked.length = 0; draw(); msg.textContent = ""; });
+    document.getElementById("check").addEventListener("click", () => {
+      if (picked.every((v, i) => v === i)) solve(id);
+      else { wrong("Thứ tự chưa đúng, lão Tư lắc đầu… Làm lại nhé!"); picked.length = 0; draw(); }
+    });
   }
-  return `
-  <div class="card cert" style="margin-top:18px">
-    <div class="big">🏅</div>
-    <span class="eyebrow">Giấy chứng nhận</span>
-    <h1>Nhà Thám Hiểm Bến Sáng Tạo</h1>
-    <p>Đã hoàn thành 6 trạm Hải trình STEM Làng Cá – hiểu vì sao thúng chai nổi, vì sao nút dây giữ được thuyền, vì sao có con nước…</p>
-    <div style="display:flex;justify-content:center">${badgeRow()}</div>
-    <p class="muted">Đưa màn hình này cho tình nguyện viên trong buổi Hải trình Chủ nhật để nhận quà nhỏ (đề xuất). Không ghi tên, không lưu thông tin cá nhân.</p>
-  </div>
-  <button class="btn ghost" id="reset">Chơi lại từ đầu</button>`;
 }
 
-function bindCert() {
-  const r = document.getElementById("reset");
-  if (r) r.addEventListener("click", () => { store.set("badges", []); route(); });
-  if (badges().length === STATIONS.length) confetti();
+// ---------------- Rương báu ----------------
+
+function pageChest() {
+  const g = game();
+  const L = letters(g);
+  const n = Object.keys(L).length;
+  if (g.chest[SEASON.id]) {
+    return `<div class="card gate gold"><div class="chest open"><div class="lid"></div><div class="base"></div><div class="shine"></div></div>
+      <span class="eyebrow">Mật mã: ${esc(SEASON.wordReveal)}</span><h1>Rương mùa này đã mở!</h1>
+      <p>Bạn là một trong những thủy thủ giải được bí ẩn của ${esc(SEASON.name)}. Đón chờ mùa mới với mật mã mới.</p>
+      <a class="btn" href="#/the">🪪 Xem thẻ thủy thủ</a></div>`;
+  }
+  if (n < 6) {
+    return `<div class="card gate"><div class="chest"><div class="lid"></div><div class="base"></div></div>
+      <h1>Rương còn khóa chặt</h1><p>Bạn mới có ${n}/6 mảnh hải đồ. Giải đủ 6 trạm rồi quay lại Cổng Bến nhé!</p>${slots(g)}
+      <a class="btn" href="#/hai-do">🗺️ Xem hải đồ</a></div>`;
+  }
+  const tiles = Object.values(L).map((c, i) => ({ c, i })).sort(() => Math.random() - 0.5);
+  return `
+  <div class="card gate gold">
+    <div class="chest" id="chest"><div class="lid"></div><div class="base"></div><div class="shine"></div></div>
+    <span class="eyebrow">Rương báu của lão ngư Tư</span>
+    <h1>Ghép mật mã</h1>
+    <p><i>“${esc(SEASON.wordHint)}”</i></p>
+    <div class="slots" id="answer">${Array.from({ length: 6 }, () => `<div class="slot" style="animation:none"></div>`).join("")}</div>
+    <div class="tiles">${tiles.map((x) => `<button class="tile" data-c="${x.c}" data-i="${x.i}">${x.c}</button>`).join("")}</div>
+    <div class="row" style="justify-content:center"><button class="btn ghost small" id="clear">Xóa</button></div>
+    <p id="cmsg" class="muted"></p>
+  </div>`;
 }
+function bindChest() {
+  const ans = [];
+  const draw = () => {
+    document.querySelectorAll("#answer .slot").forEach((s, i) => { s.textContent = ans[i] ? ans[i].c : ""; s.classList.toggle("on", !!ans[i]); });
+    document.querySelectorAll(".tile").forEach((t) => t.classList.toggle("used", ans.some((a) => a.el === t)));
+  };
+  document.querySelectorAll(".tile").forEach((t) => t.addEventListener("click", () => {
+    ans.push({ c: t.dataset.c, el: t }); draw();
+    if (ans.length === 6) {
+      if (ans.map((a) => a.c).join("") === SEASON.word) {
+        const g = game(); g.chest[SEASON.id] = true; g.points += POINTS.chest; save(g); updatePill();
+        document.getElementById("chest").classList.add("open");
+        document.getElementById("cmsg").innerHTML = `<b style="color:var(--gold);font-size:18px">${esc(SEASON.wordReveal)}!</b> Rương đã mở – +${POINTS.chest} điểm!`;
+        floatPts(POINTS.chest); confetti(90);
+        setTimeout(route, 3500);
+      } else {
+        document.getElementById("cmsg").textContent = "Rương vẫn im lìm… Thử sắp xếp lại!";
+        setTimeout(() => { ans.length = 0; draw(); }, 700);
+      }
+    }
+  }));
+  const c = document.getElementById("clear");
+  if (c) c.addEventListener("click", () => { ans.length = 0; draw(); });
+}
+
+// ---------------- Thẻ thủy thủ ----------------
+
+function pageCard() {
+  const g = game();
+  const r = rankOf(g.points);
+  const L = letters(g);
+  return `
+  <h1>Thẻ thủy thủ</h1>
+  <div class="idcard">
+    <div class="eyebrow" style="color:#fff">Bến Sáng Tạo Vũng Thùng</div>
+    <div style="font-size:40px;margin:6px 0">${r.icon}</div>
+    <b style="font-size:20px">${esc(r.name)}</b>
+    <div class="code" style="margin-top:6px">${esc(g.sailor)}</div>
+    <div style="margin-top:6px"><span style="color:var(--gold);font-weight:800;font-size:22px">${g.points}</span> điểm hải trình</div>
+    <div class="stamps">${STATIONS.map((s) => `<div class="stamp ${L[s.id] ? "on" : ""}">${L[s.id] ? s.icon : ""}</div>`).join("")}</div>
+  </div>
+  <p class="muted">Mã thẻ ngẫu nhiên, không gắn với tên hay số điện thoại. Trẻ em không có điện thoại có thể dùng <b>thẻ giấy</b> phát tại buổi Hải trình Chủ nhật (đề xuất).</p>
+
+  <h2>Tích điểm thế nào?</h2>
+  <div class="card"><table>
+    <tr><td>Giải đúng một câu đố</td><td><b>+${POINTS.solve}</b></td></tr>
+    <tr><td>Không dùng gợi ý</td><td><b>+${POINTS.noHint}</b></td></tr>
+    <tr><td>Quay lại chơi vào ngày khác</td><td><b>+${POINTS.dailyReturn}</b></td></tr>
+    <tr><td>Mở rương báu của mùa</td><td><b>+${POINTS.chest}</b></td></tr>
+    <tr><td>Dùng gợi ý</td><td><b>−${POINTS.hintCost}</b></td></tr>
+  </table><p class="muted">Mỗi ngày mỗi trạm có câu đố mới, nên càng quay lại nhiều điểm càng cao.</p></div>
+
+  <h2>Đổi điểm lấy quà</h2>
+  <div class="card">
+    ${REWARDS.map((w) => `<div class="reward-row"><span>${esc(w.item)}</span><span class="chip" style="${g.points >= w.pts ? "background:rgba(61,220,132,.2);color:#3ddc84" : ""}">${w.pts} điểm ${g.points >= w.pts ? "✓" : ""}</span></div>`).join("")}
+    <p class="muted" style="margin-top:8px">Quà nhỏ do nhà đỡ đầu tài trợ, đổi tại buổi Hải trình Chủ nhật bằng cách đưa màn hình thẻ này (đề xuất).</p>
+  </div>`;
+}
+
+// ---------------- Mùa chơi ----------------
+
+function pageSeasons() {
+  return `
+  <span class="eyebrow">Trò chơi luôn mới</span>
+  <h1>Kho báu không bao giờ cạn</h1>
+  <div class="card">
+    <div class="timeline">
+      <div class="step"><div class="time">Mỗi ngày</div><b>Câu đố xoay vòng</b><p class="muted" style="margin:0">Mỗi trạm có một kho câu đố; hôm nay và ngày mai gặp câu khác nhau. Quay lại được cộng điểm.</p></div>
+      <div class="step"><div class="time">Mỗi tháng</div><b>Mùa mới, mật mã mới</b><p class="muted" style="margin:0">Chủ đề, câu đố, chữ cái và mật mã rương thay đổi hoàn toàn. Mã QR trên biển trạm giữ nguyên, nội dung phía sau được làm mới.</p></div>
+      <div class="step"><div class="time">Ai soạn?</div><b>Giáo viên + AI hỗ trợ + người duyệt</b><p class="muted" style="margin:0">Giáo viên các trường lân cận đề xuất chủ đề; AI giúp soạn nháp nhiều biến thể câu đố; con người kiểm tra tính chính xác trước khi phát hành.</p></div>
+      <div class="step"><div class="time">Cộng đồng</div><b>Chủ đề do người chơi bình chọn</b><p class="muted" style="margin:0">Người dân đề xuất chủ đề mùa sau trong Hòm ý tưởng.</p></div>
+    </div>
+  </div>
+  <h2>Lịch các mùa</h2>
+  ${SEASONS.map((s) => `<div class="card season-card ${s.active ? "gold" : "locked-season"}"><span class="tag ${s.active ? "" : "soon"}">${s.active ? "ĐANG DIỄN RA" : esc(s.period)}</span><h3 style="margin-top:8px">${esc(s.name)}</h3>${s.teaser ? `<p class="muted" style="margin:0">${esc(s.teaser)}</p>` : `<p class="muted" style="margin:0">${esc(s.period)} · 6 trạm · 12 câu đố xoay vòng</p>`}</div>`).join("")}`;
+}
+
+// ---------------- Chế độ trình diễn cho giám khảo ----------------
+
+function pageDemo() {
+  const codes = Object.entries(STATION_CODES);
+  return `
+  <span class="eyebrow">Dành cho Ban Giám khảo</span>
+  <h1>Chế độ trình diễn</h1>
+  <p>Ngoài đời thật, người chơi phải đứng tại trạm và quét mã QR trên biển trạm. Để xem thử từ xa, bấm nút dưới đây để <b>giả lập</b> việc quét mã tại từng trạm (hoặc quét các mã trên trang <a href="qr.html" target="_blank">in mã QR</a>).</p>
+  <div class="st-list">
+    ${codes.map(([c, st]) => { const s = STATIONS.find((x) => x.id === st); return `<a class="st" href="#/q/${c}"><span class="ico">${s.icon}</span><span><b>Giả lập quét trạm ${st}</b><small>Mã trạm: ${c}</small></span><span class="lock">📷</span></a>`; }).join("")}
+    <a class="st" href="#/q/${CHEST_CODE}"><span class="ico">🧰</span><span><b>Giả lập quét mã rương (Cổng Bến)</b><small>Mã: ${CHEST_CODE}</small></span><span class="lock">📷</span></a>
+  </div>
+  <div class="row" style="margin-top:14px"><button class="btn ghost small" id="wipe">↺ Xóa tiến độ, chơi lại từ đầu</button></div>`;
+}
+function bindDemo() {
+  document.getElementById("wipe").addEventListener("click", () => { store.set("game", null); store.set("legendSeen", false); updatePill(); toast("Đã xóa tiến độ."); });
+}
+
+// ---------------- Giáo viên, du khách, cộng đồng ----------------
 
 function pageTeacher() {
   return `
-  <section class="shead a2" style="background:linear-gradient(150deg,#3a7d44,#23542b)">
-    <a href="#/">← Trang chủ</a>
-    <div class="big" style="margin-top:12px">👩‍🏫</div>
-    <h1>Lớp học ngoài trời</h1>
-    <div class="sub">Dẫn cả lớp đi Hải trình STEM Làng Cá</div>
-  </section>
-  <div class="card"><p>${esc(LESSON.fit)} Không cần đăng ký tài khoản, không cần mỗi em một điện thoại.</p>
-    <div class="row noprint"><a class="btn small" href="#/phieu">🖨️ Phiếu học tập in sẵn</a><a class="btn ghost small" href="#/hai-trinh">Xem 6 trạm</a></div></div>
-  <h2>Gợi ý tiến trình 60–75 phút</h2>
+  <span class="eyebrow">Lớp học ngoài trời</span>
+  <h1>Dẫn cả lớp đi săn kho báu</h1>
+  <div class="card"><p>${esc(LESSON.fit)} Không cần tài khoản, không cần mỗi em một điện thoại – mỗi nhóm một máy hoặc phiếu in.</p>
+    <div class="row noprint"><a class="btn small" href="#/phieu">🖨️ Phiếu học tập in sẵn</a></div></div>
+  <h2>Tiến trình 60–75 phút</h2>
   <div class="card"><div class="timeline">
     ${LESSON.steps.map((st) => `<div class="step"><div class="time">${esc(st.time)}</div><b>${esc(st.title)}</b><p class="muted" style="margin:2px 0 0">${esc(st.text)}</p></div>`).join("")}
   </div></div>
   <h2>Mỗi trạm dạy gì?</h2>
-  <div class="card"><table><tr><th>Trạm</th><th>Kiến thức</th></tr>
-    ${STATIONS.map((s) => `<tr><td>${s.icon} ${esc(s.title)}</td><td>${esc(s.subject)}</td></tr>`).join("")}
-  </table></div>
+  <div class="card"><table>${STATIONS.map((s) => `<tr><td>${s.icon} ${esc(s.title)}</td><td class="muted">${esc(s.subject)}</td></tr>`).join("")}</table></div>
   <h2>An toàn & lưu ý</h2>
   <div class="card"><ul>${LESSON.safety.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
 }
 
 function pageWorksheet() {
   return `
-  <p class="noprint muted"><a href="#/giao-vien">← Lớp học ngoài trời</a> · Nhấn Ctrl + P để in</p>
+  <p class="noprint muted" style="margin-top:14px"><a href="#/giao-vien">← Lớp học ngoài trời</a> · Ctrl + P để in</p>
   <div class="card">
-    <h1 style="margin-top:0">Phiếu Hải trình STEM Làng Cá</h1>
-    <p>Nhóm: ........................................ Lớp: .............. Ngày: ..............</p>
-    ${STATIONS.map((s) => `
-      <div style="border-top:1px solid #ccc;padding:8px 0">
-        <b>Trạm ${s.id}. ${esc(s.title)}</b>
-        <p style="margin:4px 0">${esc(s.quiz.q)}</p>
-        ${s.quiz.options.map((o, i) => `<div>☐ ${String.fromCharCode(65 + i)}. ${esc(o)}</div>`).join("")}
-        <p style="margin:6px 0 0">Điều nhóm em thấy thú vị: .........................................................................</p>
-      </div>`).join("")}
+    <h1 style="margin-top:0">Phiếu Săn Kho Báu Vũng Thùng</h1>
+    <p>Nhóm: .............................. Lớp: .......... Ngày: ..........</p>
+    ${STATIONS.map((s) => `<div style="border-top:1px solid var(--line);padding:8px 0"><b>Trạm ${s.id}. ${esc(s.title)}</b>
+      <p style="margin:4px 0">Đáp án của nhóm: ..................................... Chữ cái nhận được: [ &nbsp; ]</p>
+      <p style="margin:0">Điều nhóm em thấy thú vị: ...........................................................</p></div>`).join("")}
+    <p><b>Mật mã rương:</b> [ &nbsp; ][ &nbsp; ][ &nbsp; ][ &nbsp; ][ &nbsp; ][ &nbsp; ]</p>
   </div>
   <button class="btn noprint" onclick="window.print()">🖨️ In phiếu</button>`;
 }
 
 function pageVisitors() {
   return `
-  <section class="shead a3" style="background:linear-gradient(150deg,#1f8ac0,#0b2545)">
-    <a href="#/">← Home</a>
-    <div class="big" style="margin-top:12px">🌏</div>
-    <h1>Welcome to Vung Thung Innovation Wharf</h1>
-    <div class="sub">Where fishing traditions meet technology</div>
-  </section>
-  <div class="card"><p>This small park sits in the Nai Hien Dong fishing village area of Son Tra, Da Nang. Follow the six-station trail to discover the science behind everyday life in a Vietnamese fishing village — from bamboo basket boats to fish sauce.</p>
-  <p class="muted">Free, no app, no sign-up. Please respect the residents: the park is quiet after 9 pm.</p></div>
-  <h2>The six stations</h2>
-  ${STATIONS.map((s) => `
-    <a class="list-station" href="#/tram/${s.id}" data-en="1">
-      <span class="ico c${s.id}">${s.icon}</span><span><b>${s.id}. ${esc(s.en.title)}</b><small>${esc(s.en.subject)}</small></span>
-    </a>`).join("")}`;
-}
-
-function bindVisitors() {
-  document.querySelectorAll("[data-en]").forEach((a) => a.addEventListener("click", () => setLang("en")));
+  <span class="eyebrow">Visitors</span>
+  <h1>Treasure hunt at Vung Thung Wharf</h1>
+  <div class="card"><p>This small park sits in the Nai Hien Dong fishing village area of Son Tra, Da Nang. Walk the boat-shaped path, find the six wooden station signs and learn the science behind a Vietnamese fishing village — from bamboo basket boats to fish sauce.</p>
+  <p class="muted">Free, no app, no sign-up. Please keep quiet after 9 pm – people live here.</p></div>
+  ${STATIONS.map((s) => `<div class="card"><h3>${s.icon} ${s.id}. ${esc(s.en.title)}</h3><p class="muted" style="margin:0 0 6px">${esc(s.en.subject)}</p><p style="margin:0">${esc(s.en.text)}</p></div>`).join("")}`;
 }
 
 function ideaItem(it, voted) {
-  return `<div class="idea">
-    <button class="vote ${voted ? "on" : ""}" data-id="${esc(it.id)}"><b>${it.votes + (voted ? 1 : 0)}</b>${voted ? "Đã chọn" : "▲ Chọn"}</button>
-    <div><span class="chip">${esc(it.cat)}</span>${it.mine ? ' <span class="chip" style="background:#fff0ea;color:#e4572e">Của bạn</span>' : ""}<div style="margin-top:3px">${esc(it.text)}</div></div>
-  </div>`;
+  return `<div class="idea"><button class="vote ${voted ? "on" : ""}" data-id="${esc(it.id)}"><b>${it.votes + (voted ? 1 : 0)}</b>${voted ? "Đã chọn" : "▲ Chọn"}</button>
+    <div><span class="chip">${esc(it.cat)}</span>${it.mine ? ' <span class="chip" style="background:rgba(255,201,77,.15);color:var(--gold)">Của bạn</span>' : ""}<div style="margin-top:3px">${esc(it.text)}</div></div></div>`;
 }
-
 function pageIdeas() {
   const mine = store.get("ideas", []);
   const votes = store.get("votes", []);
   const score = (it) => it.votes + (votes.includes(it.id) ? 1 : 0);
   const all = [...mine.map((m) => ({ ...m, mine: true })), ...SAMPLE_IDEAS].sort((a, b) => score(b) - score(a));
   return `
-  <section class="shead a4" style="background:linear-gradient(150deg,#7b5ea7,#46307a)">
-    <div class="big">💡</div>
-    <h1>Hòm ý tưởng</h1>
-    <div class="sub">Công viên không có ngày “làm xong” – cả khu phố cùng thiết kế tiếp</div>
-  </section>
-  <div class="card">
-    <form id="idea-form">
-      <label for="cat">Chủ đề</label>
-      <select id="cat"><option>Hoạt động</option><option>Tiện ích</option><option>An toàn</option><option>Khác</option></select>
-      <label for="txt">Ý tưởng của bạn</label>
-      <textarea id="txt" rows="3" maxlength="300" placeholder="Ví dụ: Lớp thắt nút dây cho thiếu nhi sáng Chủ nhật"></textarea>
-      <p class="muted">Không cần tên hay số điện thoại. Hỏng hóc cần sửa gấp? Dùng mục <a href="#/su-co">Báo sự cố</a>.</p>
-      <button class="btn" type="submit">Gửi ý tưởng</button>
-    </form>
-  </div>
+  <span class="eyebrow">Cộng đồng cùng kiến tạo</span>
+  <h1>Hòm ý tưởng</h1>
+  <p class="muted">Công viên không có ngày “làm xong”. Đề xuất hoạt động, cải tạo – hay chủ đề cho mùa săn kho báu tiếp theo.</p>
+  <div class="card"><form id="idea-form">
+    <label for="cat">Chủ đề</label>
+    <select id="cat"><option>Hoạt động</option><option>Tiện ích</option><option>An toàn</option><option>Chủ đề mùa sau</option><option>Khác</option></select>
+    <label for="txt">Ý tưởng của bạn</label>
+    <textarea id="txt" rows="3" maxlength="300" placeholder="Ví dụ: Mùa sau làm chủ đề về gió mùa và diều"></textarea>
+    <p class="muted">Không cần tên hay số điện thoại. Hỏng hóc cần sửa? Dùng <a href="#/su-co">Báo sự cố</a>.</p>
+    <button class="btn" type="submit">Gửi ý tưởng</button></form></div>
   <h2>Được bình chọn nhiều nhất</h2>
-  <div class="card" id="idea-list">${all.map((it) => ideaItem(it, votes.includes(it.id))).join("")}</div>
-  <p class="muted">Ý tưởng mẫu là dữ liệu minh họa. Trong bản mẫu, ý tưởng của bạn chỉ lưu trên máy này.</p>
-
+  <div class="card">${all.map((it) => ideaItem(it, votes.includes(it.id))).join("")}</div>
+  <p class="muted">Ý tưởng mẫu là dữ liệu minh họa; trong bản mẫu, ý tưởng của bạn chỉ lưu trên máy này.</p>
   <h2>🤖 AI tổng hợp mỗi tháng</h2>
-  <div class="card">
-    <div class="timeline">
-      <div class="step"><div class="time">Bước 1</div><b>Ẩn thông tin cá nhân</b><p class="muted" style="margin:0">Loại bỏ tên, số điện thoại, email trước khi xử lý.</p></div>
-      <div class="step"><div class="time">Bước 2</div><b>AI lọc và gom nhóm</b><p class="muted" style="margin:0">Bỏ nội dung rác, gom ý giống nhau, đếm mức độ quan tâm, nhận diện sự cố cần chuyển 1022.</p></div>
-      <div class="step"><div class="time">Bước 3</div><b>Báo cáo một trang</b><p class="muted" style="margin:0">Gửi tổ dân phố và phường, kèm 1–3 việc nên làm tháng tới.</p></div>
-      <div class="step"><div class="time">Bước 4</div><b>Con người quyết định</b><p class="muted" style="margin:0">AI chỉ đề xuất; kết quả được công bố lại trên Bến Số.</p></div>
-    </div>
-    <a class="btn" href="#/bao-cao">Xem báo cáo mẫu</a>
-  </div>`;
+  <div class="card"><div class="timeline">
+    <div class="step"><div class="time">Bước 1</div><b>Ẩn thông tin cá nhân</b></div>
+    <div class="step"><div class="time">Bước 2</div><b>AI lọc rác, gom nhóm, đếm mức quan tâm, nhận diện sự cố cần chuyển 1022</b></div>
+    <div class="step"><div class="time">Bước 3</div><b>Báo cáo một trang cho tổ dân phố và phường</b></div>
+    <div class="step"><div class="time">Bước 4</div><b>Con người quyết định, kết quả công bố lại trên Bến Số</b></div>
+  </div><a class="btn sea" href="#/bao-cao">Xem báo cáo mẫu</a></div>`;
 }
-
 function bindIdeas() {
   document.getElementById("idea-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const txt = document.getElementById("txt").value.trim();
-    if (txt.length < 10) { toast("Hãy viết ý tưởng dài hơn một chút nhé (ít nhất 10 ký tự)."); return; }
-    if (/(\d[\s.-]?){9,}/.test(txt) || /@\S+\.\S+/.test(txt)) {
-      toast("Vui lòng bỏ số điện thoại/email khỏi nội dung để bảo vệ thông tin cá nhân.");
-      return;
-    }
+    if (txt.length < 10) { toast("Hãy viết dài hơn một chút nhé (ít nhất 10 ký tự)."); return; }
+    if (/(\d[\s.-]?){9,}/.test(txt) || /@\S+\.\S+/.test(txt)) { toast("Vui lòng bỏ số điện thoại/email khỏi nội dung."); return; }
     const mine = store.get("ideas", []);
     mine.unshift({ id: "m" + Date.now(), cat: document.getElementById("cat").value, text: txt, votes: 0 });
-    store.set("ideas", mine);
-    toast("Đã ghi nhận ý tưởng. Cảm ơn bạn!");
-    route();
+    store.set("ideas", mine); toast("Đã ghi nhận ý tưởng. Cảm ơn bạn!"); route();
   });
-  document.querySelectorAll(".vote").forEach((b) =>
-    b.addEventListener("click", () => {
-      const votes = store.get("votes", []);
-      const id = b.dataset.id;
-      store.set("votes", votes.includes(id) ? votes.filter((v) => v !== id) : [...votes, id]);
-      route();
-    })
-  );
+  document.querySelectorAll(".vote").forEach((b) => b.addEventListener("click", () => {
+    const votes = store.get("votes", []); const id = b.dataset.id;
+    store.set("votes", votes.includes(id) ? votes.filter((v) => v !== id) : [...votes, id]); route();
+  }));
 }
 
 function pageReport() {
@@ -423,115 +740,81 @@ function pageReport() {
   <span class="eyebrow">Báo cáo do AI tổng hợp</span>
   <h1>Góp ý cộng đồng hằng tháng</h1>
   <div class="note warn">Báo cáo MẪU, dữ liệu minh họa – mô tả định dạng đầu ra AI sẽ tạo mỗi tháng.</div>
-  <div class="card">
-    <h3>${esc(r.period)}</h3>
-    <div class="row" style="gap:10px;margin:6px 0 10px">
-      <span class="chip" style="font-size:13px">Tổng ${r.total}</span><span class="chip" style="font-size:13px">Hợp lệ ${r.valid}</span><span class="chip" style="font-size:13px;background:#fdecea;color:#c0392b">Bị lọc ${r.filtered}</span>
-    </div>
-    ${r.groups.map((g) => `
-      <div class="bar"><span class="lab">${esc(g.name)}</span><span class="track"><i style="width:${(g.count / max) * 100}%"></i></span><b>${g.count}</b></div>
-      <p class="muted" style="margin:0 0 8px">${esc(g.note)}</p>`).join("")}
+  <div class="card"><h3>${esc(r.period)}</h3>
+    <div class="row" style="margin:6px 0 10px"><span class="chip">Tổng ${r.total}</span><span class="chip">Hợp lệ ${r.valid}</span><span class="chip" style="background:rgba(255,107,107,.15);color:#ff6b6b">Bị lọc ${r.filtered}</span></div>
+    ${r.groups.map((g) => `<div class="hbar"><span class="lab">${esc(g.name)}</span><span class="track"><i style="width:${(g.count / max) * 100}%"></i></span><b>${g.count}</b></div><p class="muted" style="margin:0 0 8px">${esc(g.note)}</p>`).join("")}
   </div>
-  <div class="card"><h3>Đề xuất việc cần làm tháng tới</h3><ol>${r.actions.map((a) => `<li>${esc(a)}</li>`).join("")}</ol>
-  <h3>Chuyển kênh</h3><p>${esc(r.forwarded)}</p></div>
-  <p class="muted">Người đọc báo cáo: tổ dân phố, ban quản lý công viên, UBND phường. AI không tự ra quyết định.</p>`;
+  <div class="card"><h3>Đề xuất việc cần làm tháng tới</h3><ol>${r.actions.map((a) => `<li>${esc(a)}</li>`).join("")}</ol><h3>Chuyển kênh</h3><p>${esc(r.forwarded)}</p></div>`;
+}
+
+function pageMore() {
+  const links = [
+    ["#/mua", "🔄", "Mùa chơi & cách làm mới câu đố"], ["#/giao-vien", "👩‍🏫", "Lớp học ngoài trời cho thầy cô"], ["#/visitors", "🌏", "Visitors (English)"],
+    ["#/y-tuong", "💡", "Hòm ý tưởng & báo cáo AI"], ["#/lich", "📅", "Lịch hoạt động"], ["#/do-dau", "🌳", "Đỡ đầu cây xanh, thiết bị"], ["#/su-co", "🛠️", "Báo sự cố (1022)"],
+    ["#/gioi-thieu", "ℹ️", "Về dự án & quyền riêng tư"], ["#/giam-khao", "🎬", "Chế độ trình diễn (giám khảo)"],
+  ];
+  return `<h1>Khám phá thêm</h1><div class="st-list">${links.map(([h, i, t]) => `<a class="st" href="${h}"><span class="ico">${i}</span><span><b>${t}</b></span><span class="lock">›</span></a>`).join("")}</div>`;
 }
 
 function pageEvents() {
-  return `
-  <h1>Hoạt động tại Bến</h1>
-  <p>Ngày thường Bến là công viên của khu phố. Cuối tuần, chính các không gian đó trở thành sân chơi sáng tạo. Mọi hoạt động kết thúc trước 21:00.</p>
-  <div class="card"><div class="timeline">
-    ${EVENTS.map((e) => `<div class="step"><div class="time">${esc(e.when)}</div><b>${esc(e.what)}</b><p class="muted" style="margin:0">${esc(e.who)}</p></div>`).join("")}
-  </div></div>
+  return `<h1>Hoạt động tại Bến</h1><p class="muted">Ngày thường là công viên của khu phố; cuối tuần chính các không gian đó thành sân chơi. Mọi hoạt động kết thúc trước 21:00.</p>
+  <div class="card"><div class="timeline">${EVENTS.map((e) => `<div class="step"><div class="time">${esc(e.when)}</div><b>${esc(e.what)}</b><p class="muted" style="margin:0">${esc(e.who)}</p></div>`).join("")}</div></div>
   <p class="muted">Lịch mang tính đề xuất trong ý tưởng dự thi.</p>`;
 }
-
 function pageSponsor() {
-  return `
-  <h1>Đỡ đầu cây xanh, thiết bị</h1>
-  <p>Doanh nghiệp, gia đình, tổ chức có thể nhận đỡ đầu một cây hay một thiết bị. Người đỡ đầu được ghi nhận bằng một dòng chữ nhỏ tại hiện vật và trên trang này – không đặt biển quảng cáo.</p>
-  <div class="card"><table><tr><th>Hạng mục</th><th>Trạng thái</th></tr>
-    ${SPONSORS.map((s) => `<tr><td>${esc(s.item)}</td><td><span class="chip">${esc(s.status)}</span></td></tr>`).join("")}
-  </table></div>
-  <p class="muted">Việc tiếp nhận tài trợ do UBND phường quyết định theo quy định.</p>`;
+  return `<h1>Đỡ đầu cây xanh, thiết bị</h1><p class="muted">Người đỡ đầu được ghi nhận bằng một dòng chữ nhỏ tại hiện vật và trên trang này – không đặt biển quảng cáo.</p>
+  <div class="card"><table>${SPONSORS.map((s) => `<tr><td>${esc(s.item)}</td><td><span class="chip">${esc(s.status)}</span></td></tr>`).join("")}</table></div>`;
 }
-
 function pageIncident() {
-  return `
-  <h1>Báo sự cố</h1>
-  <p>Thấy thiết bị hỏng, cây gãy, mất vệ sinh hay điều gì không an toàn? Hãy phản ánh qua kênh chính thức của thành phố để được xử lý nhanh:</p>
-  <div class="card">
-    <h3>Tổng đài 1022 thành phố Đà Nẵng</h3>
-    <p>Gọi <b>1022</b> hoặc phản ánh qua cổng góp ý của thành phố. Ghi rõ: “Công viên góc Ngô Thì Trí – Vũng Thùng 4 – Lý Nhật Quang”, mô tả sự cố và gửi kèm ảnh nếu có.</p>
-    <a class="btn" href="tel:1022">📞 Gọi 1022</a>
-  </div>
-  <p class="muted">Bến Số không tạo kênh xử lý sự cố riêng, tránh trùng lặp với hệ thống sẵn có của thành phố.</p>`;
+  return `<h1>Báo sự cố</h1><p>Thiết bị hỏng, cây gãy, mất vệ sinh? Phản ánh qua kênh chính thức của thành phố để được xử lý nhanh:</p>
+  <div class="card"><h3>Tổng đài 1022 thành phố Đà Nẵng</h3><p>Ghi rõ: “Công viên góc Ngô Thì Trí – Vũng Thùng 4 – Lý Nhật Quang”, mô tả sự cố và gửi ảnh nếu có.</p><a class="btn" href="tel:1022">📞 Gọi 1022</a></div>`;
 }
-
 function pageAbout() {
-  return `
-  <h1>Về Bến Sáng Tạo Vũng Thùng</h1>
-  <div class="card">
-    <p><b>Bến Sáng Tạo Vũng Thùng – Nơi nghề biển gặp công nghệ</b> là ý tưởng dự thi Cuộc thi Ý tưởng Công viên Đổi mới Sáng tạo Sơn Trà 2026, cho khu đất khoảng 2.000 m² tại góc Ngô Thì Trí – Vũng Thùng 4 – Lý Nhật Quang.</p>
-    <ol>
-      <li><b>Không gian xanh</b>: bãi cỏ đa năng, sân chơi Thúng Chai, góc thong thả, Nhà Thuyền.</li>
-      <li><b>Hải trình STEM Làng Cá</b>: 6 trạm kể nghề biển bằng ngôn ngữ khoa học – cho trẻ em, lớp học và du khách.</li>
-      <li><b>Bến Số</b>: nền tảng số này, để cư dân tiếp tục cùng thiết kế công viên, có AI hỗ trợ tổng hợp ý kiến.</li>
-    </ol>
-  </div>
-  <h2>Quyền riêng tư</h2>
-  <div class="card"><ul>
-    <li>Không đăng nhập, không hỏi tên, không thu thập dữ liệu của trẻ em.</li>
-    <li>Huy hiệu, ý tưởng, bình chọn trong bản mẫu chỉ lưu trên chính thiết bị của bạn.</li>
-    <li>Khi vận hành thật, góp ý được ẩn thông tin cá nhân trước khi đưa cho AI tổng hợp.</li>
-  </ul></div>
-  <h2>Minh bạch về AI</h2>
-  <div class="card"><p>Tranh minh họa và bản nháp nội dung có thể được tạo với sự hỗ trợ của công cụ AI, sau đó được con người biên tập, kiểm tra. Bến Số không có chatbot trả lời tự do để tránh thông tin sai. Nội dung khoa học ở mức phổ thông, cần giáo viên thẩm định trước khi triển khai chính thức.</p></div>`;
+  return `<h1>Về Bến Sáng Tạo Vũng Thùng</h1>
+  <div class="card"><p><b>Bến Sáng Tạo Vũng Thùng – Nơi nghề biển gặp công nghệ</b> là ý tưởng dự thi Cuộc thi Ý tưởng Công viên Đổi mới Sáng tạo Sơn Trà 2026, cho khu đất ~2.000 m² góc Ngô Thì Trí – Vũng Thùng 4 – Lý Nhật Quang.</p>
+  <p>“Săn Kho Báu Vũng Thùng” biến 6 trạm khoa học dọc lối đi hình con thuyền thành một trò chơi giải đố gắn với địa điểm thật, được làm mới mỗi ngày và mỗi mùa.</p></div>
+  <h2>Quyền riêng tư</h2><div class="card"><ul><li>Không đăng nhập, không hỏi tên; mã thẻ thủy thủ là mã ngẫu nhiên.</li><li>Tiến độ, điểm, ý tưởng trong bản mẫu chỉ lưu trên thiết bị của bạn.</li><li>Khi vận hành thật, góp ý được ẩn thông tin cá nhân trước khi đưa cho AI tổng hợp.</li></ul></div>
+  <h2>Minh bạch về AI</h2><div class="card"><p>AI hỗ trợ soạn nháp câu đố và tổng hợp góp ý; mọi nội dung được con người kiểm tra trước khi phát hành. Không có chatbot trả lời tự do.</p></div>`;
 }
+function pageNotFound() { return `<h1>Không tìm thấy trang</h1><a class="btn" href="#/">Về trang chủ</a>`; }
 
-function pageNotFound() {
-  return `<h1>Không tìm thấy trang</h1><a class="btn" href="#/">Về trang chủ</a>`;
-}
-
-// ---------------- Ngôn ngữ & định tuyến ----------------
-
-function setLang(l) {
-  store.set("lang", l);
-  document.documentElement.lang = l;
-  document.querySelectorAll(".lang button").forEach((b) => b.classList.toggle("on", b.dataset.l === l));
-}
+// ---------------- Định tuyến ----------------
 
 function route() {
+  stopScan();
   const h = location.hash.replace(/^#\/?/, "");
   const [page, arg] = h.split("/");
   let html, bind, tab = page || "home";
   switch (page) {
-    case "": case undefined: html = pageHome(); tab = "home"; break;
-    case "hai-trinh": html = pageTrail(); break;
-    case "tram": html = pageStation(Number(arg)); bind = () => bindStation(Number(arg)); tab = "hai-trinh"; break;
-    case "chung-nhan": html = pageCert(); bind = bindCert; tab = "hai-trinh"; break;
-    case "giao-vien": html = pageTeacher(); tab = "hai-trinh"; break;
-    case "phieu": html = pageWorksheet(); tab = "hai-trinh"; break;
-    case "visitors": html = pageVisitors(); bind = bindVisitors; tab = "home"; break;
-    case "y-tuong": html = pageIdeas(); bind = bindIdeas; break;
-    case "bao-cao": html = pageReport(); tab = "y-tuong"; break;
-    case "lich": html = pageEvents(); break;
-    case "do-dau": html = pageSponsor(); tab = "home"; break;
-    case "su-co": html = pageIncident(); tab = "home"; break;
-    case "gioi-thieu": html = pageAbout(); break;
+    case "": case undefined: html = pageHome(); bind = bindHome; tab = "home"; break;
+    case "hai-do": html = pageMap(); break;
+    case "quet": html = pageScan(); bind = bindScan; break;
+    case "q": resolveCode(arg); return;
+    case "tram": html = pageStation(Number(arg)); bind = () => bindStation(Number(arg)); tab = "hai-do"; break;
+    case "ruong": html = pageChest(); bind = bindChest; tab = "hai-do"; break;
+    case "the": html = pageCard(); break;
+    case "mua": html = pageSeasons(); tab = "more"; break;
+    case "giam-khao": html = pageDemo(); bind = bindDemo; tab = "more"; break;
+    case "giao-vien": html = pageTeacher(); tab = "more"; break;
+    case "phieu": html = pageWorksheet(); tab = "more"; break;
+    case "visitors": html = pageVisitors(); tab = "more"; break;
+    case "y-tuong": html = pageIdeas(); bind = bindIdeas; tab = "more"; break;
+    case "bao-cao": html = pageReport(); tab = "more"; break;
+    case "lich": html = pageEvents(); tab = "more"; break;
+    case "do-dau": html = pageSponsor(); tab = "more"; break;
+    case "su-co": html = pageIncident(); tab = "more"; break;
+    case "gioi-thieu": html = pageAbout(); tab = "more"; break;
+    case "more": html = pageMore(); break;
     default: html = pageNotFound();
   }
   if ("speechSynthesis" in window) speechSynthesis.cancel();
+  cancelAnimationFrame(oceanRaf);
   app.innerHTML = html;
   if (bind) bind();
   document.querySelectorAll(".tabs a").forEach((a) => a.classList.toggle("active", a.dataset.tab === tab));
+  updatePill();
   window.scrollTo(0, 0);
 }
 
-document.querySelectorAll(".lang button").forEach((b) =>
-  b.addEventListener("click", () => { setLang(b.dataset.l); route(); })
-);
-setLang(lang());
 window.addEventListener("hashchange", route);
 route();

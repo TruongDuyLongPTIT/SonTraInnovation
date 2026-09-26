@@ -9,19 +9,23 @@ Mỗi ảnh chỉnh 3–5 lần là đẹp. Lưu ảnh dạng PNG/JPG, đặt t�
 
 ## Ảnh 1 – Toàn cảnh (bắt buộc)
 
-> Góc nhìn chim bay 45° từ phía góc ngã ba đường (góc bo tròn ở dưới bên phải sơ đồ). Thấy: bãi cỏ đa năng lớn ở giữa có người dân tập thể dục và trẻ em chạy chơi; lối đi vòng màu be nhạt bo tròn quanh bãi cỏ; một giàn che nhỏ hình thân thuyền úp ngược (thon hai đầu), làm bằng gỗ và tre; sân chơi trẻ em nền cát vàng có vài chiếc thúng chai tròn đan tre làm hố cát và bồn cây; dọc ranh giới phía sau chỉ có cây bụi và hoa thấp (dưới 2 m), không có cây cao; cây bóng mát lớn được trồng dọc vỉa hè phía mặt đường; góc có dụng cụ thể dục ngoài trời cho người lớn tuổi và bàn cờ. Nắng buổi sáng, không khí thân thiện.
+> Góc nhìn chim bay 45° từ phía góc ngã ba đường (góc bo tròn ở dưới bên phải sơ đồ). Thấy: bãi cỏ đa năng lớn ở giữa có người dân tập thể dục và trẻ em chạy chơi; lối đi màu be nhạt, nhìn từ trên cao có dáng một con thuyền (mũi thuyền nhọn hướng về phía đường Lý Nhật Quang); giữa lòng lối đi là một giàn che dài khoảng 20 m, mặt bằng hình thân thuyền thon hai đầu, khung tre/gỗ cong mềm mại, mái phủ kín hoa giấy màu hồng, đỏ tía rực rỡ, bên dưới có ghế ngồi và bóng mát; sân chơi trẻ em nền cát vàng có vài chiếc thúng chai tròn đan tre làm hố cát và bồn cây; dọc ranh giới phía sau chỉ có cây bụi và hoa thấp (dưới 2 m), không có cây cao; cây bóng mát lớn được trồng dọc vỉa hè phía mặt đường; góc có dụng cụ thể dục ngoài trời cho người lớn tuổi và bàn cờ. Nắng buổi sáng, không khí thân thiện.
 
 ## Ảnh 2 – Cổng Bến nhìn từ ngã ba
 
-> Góc nhìn ngang tầm mắt người đi bộ, đứng ở vỉa hè ngã ba đường nhìn vào công viên. Góc giao lộ chỉ có cỏ và cây bụi thấp (dưới đầu gối) để thông thoáng tầm nhìn giao thông. Lùi vào trong vài mét là một quảng trường nhỏ lát gạch, có một chiếc thuyền gỗ cũ sơn đỏ nâu đã bạc màu được đặt trên nền làm bồn cây trồng hoa ("Thuyền Ký Ức"), bên cạnh là tấm bảng thông tin thấp bằng gỗ hình cánh buồm nhỏ, trên bảng có mã QR và bản đồ công viên (không cần chữ đọc được). Phía sau thấy bãi cỏ và giàn che mái cong hình thuyền úp.
+> Góc nhìn ngang tầm mắt người đi bộ, đứng ở vỉa hè ngã ba đường nhìn vào công viên. Góc giao lộ chỉ có cỏ và cây bụi thấp (dưới đầu gối) để thông thoáng tầm nhìn giao thông. Lùi vào trong vài mét là một quảng trường nhỏ lát gạch, có một chiếc thuyền gỗ cũ sơn đỏ nâu đã bạc màu được đặt trên nền làm bồn cây trồng hoa ("Thuyền Ký Ức"), bên cạnh là tấm bảng thông tin thấp bằng gỗ hình cánh buồm nhỏ, trên bảng có mã QR và bản đồ công viên (không cần chữ đọc được). Phía sau thấy bãi cỏ và giàn che dài hình thân thuyền phủ đầy hoa giấy hồng tím.
 
 ## Ảnh 3 – Sân chơi Thúng Chai + trạm STEM
 
 > Góc nhìn ngang tầm mắt, cận cảnh sân chơi trẻ em: nền cát vàng, các thúng chai tre tròn đường kính khoảng 2 m được dùng làm viền hố cát (có nắp đậy) và bồn cây; một khung leo bằng lưới dây thừng an toàn, dáng như lưới đánh cá. Bên cạnh lối đi có một biển trạm nhỏ cao ngang ngực trẻ em, bằng gỗ, có hình minh họa chiếc thúng chai nổi trên nước và mã QR; một bạn nhỏ đang dùng điện thoại của mẹ quét mã. Buổi chiều, bóng cây mát.
 
+## Ảnh 3b – Giàn Thuyền Hoa Giấy (khuyến khích)
+
+> Góc nhìn ngang tầm mắt, cận cảnh một giàn che dài khoảng 20 m, mặt bằng thon hai đầu như thân thuyền, khung tre cong uốn lượn như sườn thuyền, trên mái phủ kín hoa giấy hồng cánh sen và đỏ tía đang nở rộ, nắng xuyên qua tạo bóng loang lổ; bên dưới là ghế gỗ dài, vài cụ già ngồi nghỉ, một nhóm học sinh cùng cô giáo đang giải đố trên điện thoại. Phong cách chân thực, nắng nhiệt đới.
+
 ## Ảnh 4 – Sân Bến buổi tối cuối tuần (khuyến khích)
 
-> Buổi tối cuối tuần, trên bãi cỏ đa năng có màn chiếu ngoài trời nhỏ đang chiếu phim hoạt hình cho trẻ em và gia đình ngồi trên thảm. Đèn năng lượng mặt trời thấp chiếu xuống lối đi, ánh sáng ấm, không chói vào nhà dân. Giàn che hình thuyền úp phía sau có vài người đang xem bảng trưng bày.
+> Buổi tối cuối tuần, trên bãi cỏ đa năng có màn chiếu ngoài trời nhỏ đang chiếu phim hoạt hình cho trẻ em và gia đình ngồi trên thảm. Đèn năng lượng mặt trời thấp chiếu xuống lối đi, ánh sáng ấm, không chói vào nhà dân. Giàn che hình thân thuyền phủ hoa giấy phía sau được chiếu sáng nhẹ.
 
 ## Kiểm tra trước khi dùng ảnh
 

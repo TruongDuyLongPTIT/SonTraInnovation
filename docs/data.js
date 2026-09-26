@@ -133,7 +133,7 @@ const SAMPLE_IDEAS = [
   { id: "s1", cat: "Hoạt động", text: "Tối thứ Bảy chiếu phim hoạt hình cho trẻ em trên bãi cỏ", votes: 42 },
   { id: "s2", cat: "Tiện ích", text: "Thêm ghế ngồi dưới bóng cây cho người lớn tuổi ở góc Lý Nhật Quang", votes: 35 },
   { id: "s3", cat: "Hoạt động", text: "Lớp thắt nút dây và kể chuyện nghề biển cho thiếu nhi mỗi Chủ nhật", votes: 28 },
-  { id: "s4", cat: "Tiện ích", text: "Kệ đổi sách cũ ở Nhà Thuyền", votes: 21 },
+  { id: "s4", cat: "Tiện ích", text: "Kệ đổi sách cũ ở Giàn Thuyền Hoa Giấy", votes: 21 },
   { id: "s5", cat: "An toàn", text: "Lối đi phía Lý Nhật Quang buổi tối hơi tối, nên thêm đèn", votes: 19 },
   { id: "s6", cat: "Hoạt động", text: "Triển lãm ảnh xưa Vũng Thùng do các gia đình góp", votes: 17 },
 ];
@@ -169,16 +169,16 @@ const SPONSORS = [
   { item: "Cây bóng mát dải cây đệm (15 cây)", status: "Đang tìm người đỡ đầu" },
   { item: "Dụng cụ thể dục Góc thong thả", status: "Đang tìm người đỡ đầu" },
   { item: "Biển 6 trạm Hải trình STEM", status: "Đang tìm người đỡ đầu" },
-  { item: "Giàn che Nhà Thuyền (giai đoạn 2)", status: "Đang tìm người đỡ đầu" },
+  { item: "Giàn Thuyền Hoa Giấy – khung và hoa giấy", status: "Đang tìm người đỡ đầu" },
 ];
 
 // Gợi ý tiết học ngoài trời cho giáo viên (khoảng 60–75 phút, lớp 25–35 học sinh).
 const LESSON = {
   fit: "Phù hợp học sinh tiểu học cuối cấp và THCS; giáo viên điều chỉnh độ sâu kiến thức theo lớp.",
   steps: [
-    { time: "10 phút", title: "Tập trung tại Sân Bến", text: "Giới thiệu làng cá Vũng Thùng và luật chơi. Chia lớp thành 6 nhóm, mỗi nhóm một điện thoại (của giáo viên hoặc phụ huynh đi cùng) hoặc một phiếu học tập in sẵn." },
-    { time: "35–45 phút", title: "Xoay vòng 6 trạm", text: "Mỗi nhóm bắt đầu ở một trạm khác nhau để tránh dồn ứ, dừng 6–7 phút/trạm: đọc hoặc nghe nội dung, làm phần 'Thử ngay' tại trạm, ghi đáp án câu đố vào phiếu." },
-    { time: "10 phút", title: "Tổng kết tại Nhà Thuyền / Sân Bến", text: "Các nhóm chia sẻ một điều bất ngờ nhất. Giáo viên chốt: mỗi nghề truyền thống đều ẩn chứa khoa học. Nhóm đủ 6 huy hiệu nhận chứng nhận." },
+    { time: "10 phút", title: "Tập trung tại Sân Bến", text: "Giới thiệu làng cá Vũng Thùng và luật chơi. Chia lớp thành 6 nhóm, mỗi nhóm một điện thoại (của giáo viên hoặc phụ huynh đi cùng) hoặc một phiếu in. Kể cho các em truyền thuyết rương báu của lão ngư Tư." },
+    { time: "35–45 phút", title: "Xoay vòng 6 trạm", text: "Mỗi nhóm bắt đầu ở một trạm khác nhau để tránh dồn ứ, dừng 6–7 phút/trạm: quét mã, cùng giải câu đố, ghi đáp án và chữ cái nhận được vào phiếu." },
+    { time: "10 phút", title: "Tổng kết tại Giàn Thuyền Hoa Giấy / Sân Bến", text: "Các nhóm chia sẻ một điều bất ngờ nhất. Giáo viên chốt: mỗi nghề truyền thống đều ẩn chứa khoa học. Cả lớp ghép mật mã và cùng mở rương báu ở Cổng Bến." },
     { time: "Về nhà", title: "Thí nghiệm mở rộng", text: "Chọn một thí nghiệm 'Thử ngay' (thuyền giấy bạc, dưa leo và muối...) để làm ở nhà, chụp ảnh nộp lại cho giáo viên." },
   ],
   safety: [

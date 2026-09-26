@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bến Số – Bến Sáng Tạo Vũng Thùng</title>
-<meta name="description" content="Nền tảng số của Bến Sáng Tạo Vũng Thùng – Công viên Đổi mới Sáng tạo Sơn Trà (prototype ý tưởng dự thi).">
-<meta name="theme-color" content="#fdf6e7">
+<title>Săn Kho Báu Vũng Thùng – Bến Sáng Tạo</title>
+<meta name="description" content="Trò chơi khám phá khoa học gắn với địa điểm tại Bến Sáng Tạo Vũng Thùng – Công viên Đổi mới Sáng tạo Sơn Trà (prototype ý tưởng dự thi).">
+<meta name="theme-color" content="#061a2e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -13,19 +13,20 @@
 </head>
 <body>
 <header class="top">
-  <a href="#/" class="brand"><span class="logo">⚓</span><span><b>Bến Số</b><small>Bến Sáng Tạo Vũng Thùng</small></span></a>
-  <div class="lang" aria-label="Ngôn ngữ"><button data-l="vi">VI</button><button data-l="en">EN</button></div>
+  <a href="#/" class="brand"><span class="logo">🧭</span><span><b>Săn Kho Báu Vũng Thùng</b><small>Bến Sáng Tạo · Sơn Trà</small></span></a>
+  <a class="pts-pill" href="#/the" aria-label="Điểm hải trình">⭐ <span id="pts">0</span></a>
 </header>
-<div class="demo-banner">Bản mẫu ý tưởng dự thi · dữ liệu trong trang là dữ liệu minh họa</div>
+<div class="demo-banner">Bản mẫu ý tưởng dự thi · giám khảo xem thử tại mục Thêm → Chế độ trình diễn</div>
 <main id="app" tabindex="-1"></main>
 <nav class="tabs">
-  <a href="#/" data-tab="home"><span>🏝️</span>Trang chủ</a>
-  <a href="#/hai-trinh" data-tab="hai-trinh"><span>🧭</span>Hải trình</a>
-  <a href="#/y-tuong" data-tab="y-tuong"><span>💡</span>Ý tưởng</a>
-  <a href="#/lich" data-tab="lich"><span>📅</span>Hoạt động</a>
-  <a href="#/gioi-thieu" data-tab="gioi-thieu"><span>ℹ️</span>Giới thiệu</a>
+  <a href="#/" data-tab="home"><span>🏝️</span>Bến</a>
+  <a href="#/hai-do" data-tab="hai-do"><span>🗺️</span>Hải đồ</a>
+  <a href="#/quet" data-tab="quet" class="scan"><span>📷</span>Quét mã</a>
+  <a href="#/the" data-tab="the"><span>🪪</span>Thẻ</a>
+  <a href="#/more" data-tab="more"><span>☰</span>Thêm</a>
 </nav>
 <script src="data.js"></script>
+<script src="season.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
