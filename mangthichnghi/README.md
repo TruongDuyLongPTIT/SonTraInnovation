@@ -87,9 +87,9 @@ thích nghi kinh điển, hệ số quên 0,995); LSTM và MLP làm một bướ
 |---|---|---|---|---|
 | **ESN + RLS** | **0,0002** | 1,29 ± 0,31 | **0,13 ± 0,02** | 4,3 s |
 | ESN đóng băng | 0,0002 | 1,51 ± 0,24 | 1,46 ± 0,20 | – |
-| LSTM + Adam trực tuyến | 0,023 | **0,87 ± 0,05** | 0,70 ± 0,09 | 87 s |
+| LSTM + Adam trực tuyến | 0,023 | **0,87 ± 0,05** | 0,70 ± 0,09 | 91 s |
 | LSTM đóng băng | 0,004 | 1,39 ± 0,05 | 1,36 ± 0,02 | – |
-| MLP + Adam trực tuyến | 0,18 | 1,63 ± 0,19 | 0,85 ± 0,04 | 2,8 s |
+| MLP + Adam trực tuyến | 0,18 | 1,63 ± 0,19 | 0,85 ± 0,04 | 3,0 s |
 
 **Đọc kết quả**
 - Dự báo tự do: ESN đoán đúng **lâu gấp ~1,7 lần** LSTM, và huấn luyện **nhanh hơn ~160 lần**, vì chỉ
@@ -216,7 +216,8 @@ dòng dữ liệu thay đổi theo thời gian.
 pip install -r requirements.txt
 python3 tn1_hoc_lien_tuc.py      # ~30 giây
 python3 tn2_chuoi_hon_loan.py    # lâu nhất (~1 giờ trên CPU 4 nhân, chủ yếu do LSTM)
-                                 # thêm --chi-phan-B để giữ kết quả phần A và chỉ chạy lại phần B
+                                 # --chi-phan-B: giữ kết quả phần A, chỉ chạy lại phần B
+                                 # --chi-ve-hinh: chỉ vẽ lại hình từ dữ liệu đã lưu
 python3 tn3_tien_hoa.py          # ~10 phút
 python3 tn4_can_bang_noi_moi.py  # ~10 phút
 python3 tn5_physarum.py          # ~1 phút

@@ -354,8 +354,8 @@ def phan_B(so_seed, ch):
         H, _ = esn.trang_thai(x)
         F = esn.dac_trung(H, x)
         du = {k: np.full(n, np.nan) for k in ["ESN + RLS (trực tuyến)", "ESN đóng băng",
-                                               "LSTM + SGD trực tuyến", "LSTM đóng băng",
-                                               "MLP + SGD trực tuyến"]}
+                                               "LSTM + Adam trực tuyến", "LSTM đóng băng",
+                                               "MLP + Adam trực tuyến"]}
         t0 = time.perf_counter()
         rls = ESN_RLS(esn)
         for t in range(2000, n - NGANG):
@@ -390,12 +390,12 @@ def phan_B(so_seed, ch):
         p, st = p0, opt.init(p0)
         t0 = time.perf_counter()
         for t in range(2000, n - NGANG):
-            du["LSTM + SGD trực tuyến"][t + NGANG] = float(du_doan_cuoi(p, jnp.asarray(x[t - L + 1:t + 1])))
+            du["LSTM + Adam trực tuyến"][t + NGANG] = float(du_doan_cuoi(p, jnp.asarray(x[t - L + 1:t + 1])))
             # cặp (đầu vào đến t-NGANG, đích đến t) vừa đủ nhãn
             p, st = buoc_tt(p, st, jnp.asarray(x[t - NGANG - L + 1:t - NGANG + 1]), jnp.asarray(x[t - L + 1:t + 1]))
         tg_lstm = time.perf_counter() - t0
 
-        # --- MLP cửa sổ + SGD trực tuyến
+        # --- MLP cửa sổ + Adam trực tuyến
         m = MLPCuaSo(cua_so=ch_mlp, seed=s)
         m.huan_luyen(u_tr, d_tr)
         opt_m = optax.adam(1e-3)
@@ -412,7 +412,7 @@ def phan_B(so_seed, ch):
         k = ch_mlp
         t0 = time.perf_counter()
         for t in range(2000, n - NGANG):
-            du["MLP + SGD trực tuyến"][t + NGANG] = float(du_m(ts, jnp.asarray(x[None, t - k + 1:t + 1]))[0])
+            du["MLP + Adam trực tuyến"][t + NGANG] = float(du_m(ts, jnp.asarray(x[None, t - k + 1:t + 1]))[0])
             j = np.arange(t - NGANG - 31, t - NGANG + 1)  # 32 cặp gần nhất đã có nhãn
             X = np.stack([x[i - k + 1:i + 1] for i in j])
             ts, st_m = buoc_m(ts, st_m, jnp.asarray(X), jnp.asarray(x[j + NGANG]))
@@ -426,7 +426,7 @@ def phan_B(so_seed, ch):
             kq.setdefault(kk, []).append((truoc, ngay_sau, ve_sau))
             cuon = np.sqrt(trung_binh_truot(np.nan_to_num(e[2000:]), 100))
             duong.setdefault(kk, []).append(cuon)
-        kq.setdefault("_giay_xu_ly_truc_tuyen", []).append({"ESN+RLS": tg_esn, "LSTM+SGD": tg_lstm, "MLP+SGD": tg_mlp})
+        kq.setdefault("_giay_xu_ly_truc_tuyen", []).append({"ESN+RLS": tg_esn, "LSTM+Adam": tg_lstm, "MLP+Adam": tg_mlp})
         print(f"B seed {s}: " + " | ".join(f"{kk}: {np.round(v[-1], 3).tolist()}" for kk, v in kq.items()
                                             if not kk.startswith("_")))
     tom = {}
@@ -455,12 +455,13 @@ def ve_hinh(tho):
     ax[0].set_title("TN2A · Dự báo tự do Mackey-Glass (mô hình tự nuôi bằng dự báo của chính nó)")
     ax[0].set_xlabel("bước dự báo")
     ax[0].legend(fontsize=8, ncol=4, loc="lower left")
-    mau2 = {"ESN + RLS (trực tuyến)": "#00798c", "ESN đóng băng": "#8fc9cf", "LSTM + SGD trực tuyến": "#d1495b",
-            "LSTM đóng băng": "#eaa0ab", "MLP + SGD trực tuyến": "#edae49"}
+    mau2 = {"ESN + RLS (trực tuyến)": "#00798c", "ESN đóng băng": "#8fc9cf", "LSTM + Adam trực tuyến": "#d1495b",
+            "LSTM đóng băng": "#eaa0ab", "MLP + Adam trực tuyến": "#edae49"}
+    bo = NGANG + 100  # bỏ các bước đầu: 10 bước chưa có dự báo + cửa sổ trượt chưa đầy
     for k, v in tho["duong_B"].items():
-        ax[1].plot(np.arange(2000, 2000 + len(v)), v, color=mau2[k], lw=1.5, label=k)
+        ax[1].plot(np.arange(2000 + bo, 2000 + len(v)), v[bo:], color=mau2[k], lw=1.5, label=k)
     ax[1].axvline(DOI_CHE_DO, color="#555", ls=":", lw=1)
-    ax[1].text(DOI_CHE_DO + 20, 3, "tau 17 → 30", fontsize=8)
+    ax[1].text(DOI_CHE_DO + 30, 1e-3, "τ đổi 17 → 30", fontsize=8)
     ax[1].set_yscale("log")
     ax[1].set_title("TN2B · Sai số dự báo x(t+10) khi hệ đổi chế độ (TB trượt 100 bước về trước, 5 seed)")
     ax[1].set_xlabel("thời gian")
@@ -489,6 +490,11 @@ def main(so_seed=5, chi_phan_B=False):
 
 
 if __name__ == "__main__":
+    import json
     import pprint
     import sys
-    pprint.pprint(main(chi_phan_B="--chi-phan-B" in sys.argv))
+    if "--chi-ve-hinh" in sys.argv:  # vẽ lại hình từ ketqua/tn2_du_lieu_tho.json
+        with open(duong_dan("tn2_du_lieu_tho.json"), encoding="utf-8") as f:
+            ve_hinh(json.load(f))
+    else:
+        pprint.pprint(main(chi_phan_B="--chi-phan-B" in sys.argv))
