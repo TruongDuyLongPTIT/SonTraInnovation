@@ -163,7 +163,8 @@ p { margin: 6px 0 10px; }
 .dial .num { width: 54px; height: 64px; border-radius: 12px; display: grid; place-items: center; font-size: 34px; font-weight: 800; background: linear-gradient(#2b1a07, #5b3a12 50%, #2b1a07); color: var(--gold); box-shadow: inset 0 0 12px rgba(0, 0, 0, .6); }
 .order-pool, .order-picked { display: grid; gap: 8px; margin: 8px 0; }
 .chipbtn { text-align: left; border: 2px dashed #b08a4a; background: rgba(255, 255, 255, .5); border-radius: 12px; padding: 10px 12px; font-size: 14.5px; cursor: pointer; color: var(--ink); }
-.chipbtn.picked { border-style: solid; background: #fff7e2; }
+.chipbtn.picked { border-style: solid; border-color: #5b3a12; background: #fff3cf; }
+.chipbtn:not(.picked) .n { background: #c9a76a; }
 .chipbtn .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #5b3a12; color: var(--parch); font-size: 12px; font-weight: 800; margin-right: 8px; }
 .hint { background: rgba(91, 58, 18, .1); border-left: 4px solid #b08a4a; padding: 9px 12px; border-radius: 10px; font-size: 14px; margin-top: 10px; }
 .reward { text-align: center; }

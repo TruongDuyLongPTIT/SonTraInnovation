@@ -229,7 +229,7 @@ for num, name in [(1, "Vì sao thúng chai nổi?"), (2, "Nút buộc của ngư
     y += 28
 y += 8
 for line in ["Mỗi trạm: biển thấp tầm trẻ em + chi tiết", "tương tác cơ học (không điện, không nước)",
-             "+ mã QR mở nền tảng số “Bến Số”."]:
+             "+ mã QR mở câu đố “Săn Kho Báu”."]:
     o.append(f'<text x="{LX}" y="{y}" font-size="13" fill="#444">{line}</text>'); y += 19
 
 # thước tỉ lệ

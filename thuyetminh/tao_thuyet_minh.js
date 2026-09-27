@@ -75,7 +75,7 @@ children.push(
   para("Ý tưởng gồm ba lớp gắn chặt với nhau:"),
   num([t("Không gian xanh cho mọi người: ", { bold: true }), t("bãi cỏ đa năng “Sân Bến”, sân chơi “Thúng Chai” tái sử dụng vật liệu nghề biển, “Góc thong thả” cho người lớn tuổi, dải xanh thấp và vườn mưa dọc ranh giới phía sau.")], "num1"),
   num([t("Hải trình STEM Làng Cá: ", { bold: true }), t("6 trạm dọc lối đi hình con thuyền dành cho trẻ em, các lớp học ngoài trời và du khách; mỗi trạm kể một nét của nghề biển bằng ngôn ngữ khoa học – vì sao thúng chai nổi, nút buộc của ngư dân, con nước và mặt trăng, nhìn sao đi biển đến GPS, muối và nước mắm, hành trình chai nhựa ra biển. Trẻ em học khoa học từ chính nghề của ông bà mình.")], "num1"),
-  num([t("Bến Số – nền tảng số có AI hỗ trợ: ", { bold: true }), t("quét mã QR là dùng được, không cần cài ứng dụng, không đăng nhập. Người dân đề xuất và bình chọn ý tưởng cho công viên; mỗi tháng AI lọc, gom nhóm và tóm tắt góp ý thành báo cáo một trang để tổ dân phố và phường ra quyết định.")], "num1"),
+  num([t("Bến Số – nền tảng số có AI hỗ trợ: ", { bold: true }), t("quét mã QR là dùng được, không cần cài ứng dụng, không đăng nhập. Trò chơi “Săn Kho Báu Vũng Thùng” chỉ mở câu đố khi người chơi đứng tại trạm, câu đố đổi mỗi ngày, mật mã rương đổi mỗi tháng. Người dân đề xuất và bình chọn ý tưởng cho công viên; mỗi tháng AI lọc, gom nhóm và tóm tắt góp ý thành báo cáo một trang để tổ dân phố và phường ra quyết định.")], "num1"),
   para([t("Điểm cốt lõi: ", { bold: true }), t("chi phí thấp, không có thiết bị điện tử ngoài trời phải bảo trì, không cần người trực, đầu tư theo giai đoạn – nhưng mang đúng tinh thần “Công viên Đổi mới Sáng tạo” và chủ đề của Sơn Trà Innovation Fest 2026: “Công nghệ toàn cầu hội ngộ phong cách sống địa phương”.")]),
 );
 
@@ -93,8 +93,8 @@ children.push(
   para("Khu đất nhỏ nhưng nằm ở vị trí giao thoa: giữa khu dân cư làng cá, gần bến neo đậu Vũng Thùng, cầu Thuận Phước, cảng Tiên Sa và các tuyến du lịch của bán đảo Sơn Trà. Vì vậy công viên cần phục vụ ba nhóm người dùng, mỗi nhóm một nhu cầu khác nhau nhưng dùng chung một không gian:"),
   table([22, 38, 40], [
     ["Nhóm", "Nhu cầu", "Bến đáp ứng bằng"],
-    ["Cư dân khu phố – trẻ em, người lớn tuổi, các gia đình (nhóm chính, dùng hằng ngày)", "Chỗ chơi an toàn cho trẻ gần nhà; chỗ đi bộ, tập thể dục, ngồi nghỉ có bóng mát; không gian sinh hoạt chung của khu phố.", "Sân chơi Thúng Chai nhìn thấy từ vỉa hè; lối đi vòng ~135 m; Góc thong thả; bãi cỏ Sân Bến cho sinh hoạt cộng đồng; Hòm ý tưởng để chính cư dân quyết định công viên thay đổi thế nào."],
-    ["Giáo viên và học sinh các trường lân cận (theo đoàn, theo lịch)", "Địa điểm học ngoài lớp gần trường, an toàn, không tốn phí, có nội dung gắn với chương trình khoa học và giáo dục địa phương.", "Hải trình STEM 6 trạm; gợi ý tiết học 60–75 phút; phiếu học tập in sẵn; học sinh không cần điện thoại riêng hay tài khoản; nhóm đủ 6 huy hiệu nhận chứng nhận."],
+    ["Cư dân khu phố – trẻ em, người lớn tuổi, các gia đình (nhóm chính, dùng hằng ngày)", "Chỗ chơi an toàn cho trẻ gần nhà; chỗ đi bộ, tập thể dục, ngồi nghỉ có bóng mát; không gian sinh hoạt chung của khu phố.", "Sân chơi Thúng Chai nhìn thấy từ vỉa hè; lối đi hình con thuyền ~145 m; Góc thong thả; bãi cỏ Sân Bến cho sinh hoạt cộng đồng; Hòm ý tưởng để chính cư dân quyết định công viên thay đổi thế nào."],
+    ["Giáo viên và học sinh các trường lân cận (theo đoàn, theo lịch)", "Địa điểm học ngoài lớp gần trường, an toàn, không tốn phí, có nội dung gắn với chương trình khoa học và giáo dục địa phương.", "Hải trình STEM 6 trạm; gợi ý tiết học 60–75 phút; phiếu học tập in sẵn; học sinh không cần điện thoại riêng hay tài khoản; cả lớp cùng giải đố, ghép mật mã và mở rương báu."],
     ["Du khách trong nước và quốc tế (ghé thăm theo tuyến khám phá làng biển)", "Trải nghiệm văn hóa làng biển chân thực, ngắn gọn, miễn phí; thông tin có tiếng Anh.", "Hành trình tự khám phá 20–30 phút; nội dung tiếng Anh cho 6 trạm; điểm check-in thúng chai; lời nhắc tôn trọng sự yên tĩnh của khu dân cư."],
   ]),
   para([t("Một buổi sáng ở Bến có thể trông như thế này: ", { bold: true, italics: true }), t("6 giờ, các cụ tập thể dục ở Góc thong thả; 9 giờ, cô giáo dẫn một lớp đến, chia 6 nhóm, mỗi nhóm bắt đầu ở một trạm – nhóm này cãi nhau vì sao thúng chai nổi, nhóm kia tập thắt nút ghế đơn; 10 giờ, một gia đình du khách đi hết hải trình bằng tiếng Anh rồi chụp ảnh bên thúng chai; chiều tối, trẻ em khu phố ra Sân chơi Thúng Chai, còn bố mẹ bình chọn ý tưởng “chiếu phim tối thứ Bảy” trên điện thoại.", { italics: true })]),
@@ -140,7 +140,7 @@ children.push(
 // 4. Hải trình STEM
 children.push(
   h1("4. Hải trình STEM Làng Cá"),
-  para("Mỗi trạm gồm: biển thấp vừa tầm mắt trẻ em bằng vật liệu bền (gỗ xử lý/composite), một chi tiết tương tác cơ học đơn giản (không dùng điện, không dùng nước), phần tóm tắt in trực tiếp trên biển cho người không dùng điện thoại, và mã QR mở nội dung đầy đủ trên Bến Số (bài đọc, nghe đọc, thí nghiệm tại nhà, câu đố nhận huy hiệu)."),
+  para("Mỗi trạm gồm: biển thấp vừa tầm mắt trẻ em bằng vật liệu bền (gỗ xử lý/composite), một chi tiết tương tác cơ học đơn giản (không dùng điện, không dùng nước), phần tóm tắt in trực tiếp trên biển cho người không dùng điện thoại, và mã QR – chiếc “chìa khóa” mở câu đố Săn Kho Báu của trạm (chỉ mở khi quét tại chỗ) cùng bài đọc, nghe đọc và thí nghiệm tại nhà."),
   table([6, 26, 22, 46], [
     ["#", "Trạm", "Kiến thức", "Chi tiết tương tác tại trạm"],
     ["1", "Vì sao thúng chai nổi?", "Vật lý: lực đẩy Archimedes", "Mô hình thúng chai cắt đôi thấy lòng rỗng chứa không khí; gợi ý thí nghiệm thuyền giấy bạc ở nhà."],
@@ -150,7 +150,7 @@ children.push(
     ["5", "Muối, cá và nước mắm", "Hóa học, sinh học", "Hình minh họa hiện tượng thẩm thấu; câu chuyện nghề nước mắm miền Trung."],
     ["6", "Hành trình chai nhựa ra biển", "Môi trường, phân loại rác", "Sơ đồ đường đi của rác từ phố ra biển; gắn với thùng rác phân loại ở Cổng Bến."],
   ]),
-  para([t("Giá trị: ", { bold: true }), t("biến công viên thành lớp học ngoài trời cho các trường lân cận; giữ gìn ký ức nghề biển theo cách hấp dẫn thế hệ trẻ; hoàn thành 6 trạm nhận giấy chứng nhận “Nhà Thám Hiểm Bến Sáng Tạo” (không ghi tên, không lưu thông tin cá nhân). Nội dung khoa học viết ở mức phổ thông và sẽ được giáo viên thẩm định trước khi triển khai.")], { spacing: { before: 120 } }),
+  para([t("Giá trị: ", { bold: true }), t("biến công viên thành lớp học ngoài trời cho các trường lân cận; giữ gìn ký ức nghề biển theo cách hấp dẫn thế hệ trẻ; giải đủ 6 trạm để ghép mật mã, mở rương báu và lên cấp thủy thủ (không ghi tên, không lưu thông tin cá nhân); câu đố đổi mỗi ngày và mỗi mùa nên các em muốn quay lại. Nội dung khoa học viết ở mức phổ thông và sẽ được giáo viên thẩm định trước khi triển khai.")], { spacing: { before: 120 } }),
 );
 
 // 5. Bến Số và AI

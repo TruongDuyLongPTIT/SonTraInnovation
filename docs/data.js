@@ -159,7 +159,7 @@ const SAMPLE_REPORT = {
 };
 
 const EVENTS = [
-  { when: "Sáng Chủ nhật hằng tuần", what: "Hải trình STEM cho thiếu nhi – đi 6 trạm, nhận huy hiệu", who: "Tình nguyện viên / Đoàn thanh niên (đề xuất)" },
+  { when: "Sáng Chủ nhật hằng tuần", what: "Săn Kho Báu cho thiếu nhi – giải 6 trạm, mở rương, đổi điểm lấy quà nhỏ", who: "Tình nguyện viên / Đoàn thanh niên (đề xuất)" },
   { when: "Tối thứ Bảy cuối tháng", what: "Chiếu phim hoạt hình AI của cuộc thi SIF trên Sân Bến (kết thúc trước 21:00)", who: "Phường phối hợp BTC SIF (đề xuất)" },
   { when: "Hằng quý", what: "Làm mới 'Bảng Đổi mới Sơn Trà' – sản phẩm STEM, tranh vẽ của học sinh, ảnh xưa do cư dân góp", who: "Trường học, UBND phường (đề xuất)" },
   { when: "Mỗi tháng một lần", what: "'Cuối tuần xanh' – nhặt rác, phân loại rác, trồng và chăm cây", who: "Cộng đồng khu dân cư (đề xuất)" },

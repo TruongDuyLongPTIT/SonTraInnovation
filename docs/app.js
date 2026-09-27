@@ -1,20 +1,24 @@
 // Bến Số – "Săn Kho Báu Vũng Thùng". Ứng dụng một trang, định tuyến bằng hash, không cần máy chủ.
 // Không đăng nhập, không thu thập dữ liệu cá nhân: mọi tiến độ chỉ lưu trên thiết bị (localStorage).
 
+// Nếu trình duyệt chặn localStorage (một số trình duyệt nhúng), vẫn chơi được trong phiên hiện tại nhờ bộ nhớ tạm.
+const memory = {};
 const store = {
   get(key, fallback) {
     try {
       const v = localStorage.getItem("benso:" + key);
-      return v === null ? fallback : JSON.parse(v);
+      if (v !== null) return JSON.parse(v);
     } catch (e) {
-      return fallback;
+      /* bị chặn lưu trữ: dùng bộ nhớ tạm */
     }
+    return key in memory ? JSON.parse(memory[key]) : fallback;
   },
   set(key, value) {
+    memory[key] = JSON.stringify(value);
     try {
-      localStorage.setItem("benso:" + key, JSON.stringify(value));
+      localStorage.setItem("benso:" + key, memory[key]);
     } catch (e) {
-      /* chế độ ẩn danh hoặc bị chặn lưu trữ: bỏ qua */
+      /* bị chặn lưu trữ: đã giữ trong bộ nhớ tạm */
     }
   },
 };
@@ -403,9 +407,8 @@ function puzzleBody(p) {
       <div class="row" style="justify-content:center"><button class="btn" id="try">🔓 Mở khóa</button></div>`;
   }
   const shuffled = p.items.map((t, i) => ({ t, i })).sort(() => Math.random() - 0.5);
-  return `<p class="muted">Chạm lần lượt theo đúng thứ tự:</p>
-    <div class="order-picked" id="picked"></div>
-    <div class="order-pool" id="pool">${shuffled.map((x) => `<button class="chipbtn" data-i="${x.i}">${esc(x.t)}</button>`).join("")}</div>
+  return `<p class="muted">Chạm vào từng mảnh theo đúng thứ tự (chạm lại để bỏ chọn):</p>
+    <div class="order-pool" id="pool">${shuffled.map((x) => `<button type="button" class="chipbtn" data-i="${x.i}"><span class="n">·</span>${esc(x.t)}</button>`).join("")}</div>
     <div class="row"><button class="btn small" id="check" disabled>Kiểm tra</button><button class="btn ghost small" id="reset" style="color:#5b3a12;border-color:#b08a4a">Làm lại</button></div>`;
 }
 
@@ -506,11 +509,19 @@ function bindStation(id) {
   } else {
     const picked = [];
     const draw = () => {
-      document.getElementById("picked").innerHTML = picked.map((i, n) => `<div class="chipbtn picked"><span class="n">${n + 1}</span>${esc(p.items[i])}</div>`).join("");
-      document.querySelectorAll("#pool .chipbtn").forEach((b) => (b.style.display = picked.includes(Number(b.dataset.i)) ? "none" : ""));
+      document.querySelectorAll("#pool .chipbtn").forEach((b) => {
+        const pos = picked.indexOf(Number(b.dataset.i));
+        b.classList.toggle("picked", pos >= 0);
+        b.querySelector(".n").textContent = pos >= 0 ? pos + 1 : "·";
+      });
       document.getElementById("check").disabled = picked.length !== p.items.length;
     };
-    document.querySelectorAll("#pool .chipbtn").forEach((b) => b.addEventListener("click", () => { picked.push(Number(b.dataset.i)); draw(); }));
+    document.querySelectorAll("#pool .chipbtn").forEach((b) => b.addEventListener("click", () => {
+      const i = Number(b.dataset.i);
+      const pos = picked.indexOf(i);
+      if (pos >= 0) picked.splice(pos, 1); else picked.push(i);
+      draw();
+    }));
     document.getElementById("reset").addEventListener("click", () => { picked.length = 0; draw(); msg.textContent = ""; });
     document.getElementById("check").addEventListener("click", () => {
       if (picked.every((v, i) => v === i)) solve(id);

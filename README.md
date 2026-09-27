@@ -4,7 +4,7 @@ Hồ sơ ý tưởng dự thi **Cuộc thi Ý tưởng Công viên Đổi mới 
 (khu đất ~2.000 m², góc Ngô Thì Trí – Vũng Thùng 4 – Lý Nhật Quang).
 
 - `sodo/` – sơ đồ mặt bằng phân khu (`so_do_mat_bang.png`), script vẽ, câu lệnh tạo ảnh phối cảnh AI.
-- `docs/` – prototype web "Bến Số" (tĩnh, chạy được trên GitHub Pages), mã QR (`qr/`, `qr.html`).
+- `docs/` – prototype web "Săn Kho Báu Vũng Thùng" (tĩnh, chạy được trên GitHub Pages), mã QR (`qr/`, `qr.html`).
 - `thuyetminh/` – bản thuyết minh ý tưởng (.docx).
 
 Chạy thử prototype: `cd docs && python3 -m http.server` rồi mở http://localhost:8000
