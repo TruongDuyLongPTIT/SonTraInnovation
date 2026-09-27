@@ -11,6 +11,27 @@ mà lý thuyết cho là **điểm mạnh** của nó, rồi so với mạng nơ
 | 3 | NEAT | Tiến hoá cấu trúc mạng (Stanley & Miikkulainen) | Không cần gradient, mạng tí hon, tự tiến hoá trí nhớ |
 | 4 | Homeostat siêu ổn định | Điều khiển học (Ashby, *Design for a Brain*) | Tự hồi phục khi hệ bị hỏng, không cần mục tiêu hay mô hình |
 | 5 | Mạng dòng chảy Physarum có thưởng | Nấm nhầy (Tero et al.) + luật 3 yếu tố | Ý tưởng mới, thử xem có dùng được không |
+| 6 | **Mạng lai HCN** (Hồ chứa – Cộng hưởng – Nội môi) | Ghép 1 + 2 + 4 | Dòng dữ liệu thay đổi liên tục |
+
+## Các bài toán này thực chất là gì? (đọc phần này trước)
+
+Mỗi thí nghiệm là một "kỳ thi" giữa hai thí sinh: **mô hình thích nghi khác** và **mạng nơ-ron học bằng
+backprop** (loại đang dùng trong gần như mọi AI hiện nay). Đề thi được chọn đúng vào loại tình huống
+mà mạng nơ-ron *thường* gặp khó khi triển khai thật: thế giới thay đổi sau khi đã học xong.
+
+| TN | Đề thi, nói bằng lời thường | Tình huống ngoài đời giống thế này | Đo cái gì |
+|---|---|---|---|
+| 1 | Dạy nhận chữ số viết tay theo từng đợt: đợt 1 chỉ dạy chữ 0 và 1, đợt 2 chỉ dạy 2 và 3… Học đợt sau thì **không được xem lại** ảnh của đợt trước. Cuối cùng thi cả 10 chữ số. | Camera nhà máy được dạy thêm loại lỗi mới mỗi tháng; không lưu được dữ liệu cũ (dung lượng, quyền riêng tư). | % đoán đúng trên cả 10 chữ số: có **quên** cái cũ không? |
+| 2A | Cho xem một đường tín hiệu hỗn loạn (giống nhịp tim, thời tiết, dao động máy móc), rồi bắt **tự vẽ tiếp** càng xa càng tốt, không được nhìn đáp án. | Dự báo phụ tải điện, dao động cơ khí, chuỗi sinh học. | Vẽ đúng được bao nhiêu bước; mất bao lâu để học. |
+| 2B | Giữa chừng, "luật" sinh ra tín hiệu đột ngột đổi. Mô hình vừa dự báo vừa tự sửa. | Máy móc bị mòn, thị trường đổi pha, cảm biến trôi. | Sai số trước, ngay sau và lâu sau khi đổi. |
+| 3 | Giữ một cây gậy dựng đứng trên chiếc xe đẩy (chỉ được đẩy trái/phải). Phiên bản khó: **không được biết vận tốc**, chỉ thấy vị trí. | Robot giữ thăng bằng, điều khiển drone. | Có giữ được 500 bước không; cần thử bao nhiêu lần; mạng to cỡ nào. |
+| 4 | Như TN3, nhưng đang giữ tốt thì **hỏng**: động cơ bị nối ngược dây, hoặc cảm biến góc bị lắp ngược. | Robot bị va đập, thiết bị bị lắp sai khi bảo trì. | Mất bao lâu để tự giữ lại được gậy. |
+| 5 | Nhận chữ số viết tay bình thường (dữ liệu trộn đều, học bao nhiêu lượt cũng được). | Bài phân loại "sách giáo khoa". | % đoán đúng. Đây là sân nhà của mạng nơ-ron. |
+| 6 | Một **dòng** ảnh chữ số liên tục thay đổi (chi tiết ở TN6). Mỗi ảnh: đoán trước, rồi mới được biết đáp án. | Hệ thống chạy thật, luôn học trong lúc làm việc. | % đoán đúng suốt dòng dữ liệu. |
+
+"Mạng nơ-ron" trong các thí nghiệm là: **MLP** (mạng nhiều lớp thông thường) ở TN1, TN5, TN6; **LSTM**
+(mạng có trí nhớ, chuẩn cho chuỗi thời gian) ở TN2; **PPO** (thuật toán học tăng cường phổ biến nhất,
+dùng MLP) ở TN3, TN4. Tất cả học bằng backprop + Adam, là cách huấn luyện chuẩn hiện nay.
 
 ## Cách làm để so sánh công bằng
 
@@ -32,6 +53,7 @@ mà lý thuyết cho là **điểm mạnh** của nó, rồi so với mạng nơ
 | 3 | Con lắc ngược, không dùng gradient | NEAT: mạng **5 tham số**, chạy 4 s | PPO: 9.155 tham số, 46 s, nhưng cần ít bước hơn và ổn định hơn | ➖ **Hoà**: gọn hơn nhưng kém tin cậy |
 | 4 | Tự hồi phục khi hệ bị hỏng | Homeostat: hồi phục 5/5, **~6–7 nghìn bước** | PPO học tiếp: 5/5 và 2/5, 25–36 nghìn bước; đóng băng: 0/5 | ✅ **Thắng** (mới thử với bộ điều khiển nhỏ) |
 | 5 | Phân loại chữ số (ý tưởng mới) | Physarum: 87,5% | MLP 97,4% | ❌ **Thua** |
+| 6 | Dòng dữ liệu đổi 4 lần (5 pha) | **Mạng lai HCN: 94,8%** | MLP trực tuyến 78,9% | ✅ **Thắng rõ** |
 
 ---
 
@@ -185,6 +207,58 @@ thì dày lên, tới cống bị đoán sai thì mỏng đi, ống không dùng
 - Muốn đi tiếp hướng này cần (a) phi tuyến, ví dụ độ dẫn thay đổi nhanh ngay trong lúc suy luận
   (μ > 1, kiểu "thắng làm vua"), và (b) cơ chế bảo vệ ống cũ, học theo ART.
 
+## TN6 · Mạng lai HCN: Hồ chứa – Cộng hưởng – Nội môi
+
+`tn6_mang_lai.py` · Ghép phần tinh tuý của ba mô hình đã thắng:
+
+1. **Hồ chứa** (từ ESN): 512 nơ-ron ngẫu nhiên **cố định** biến ảnh thành đặc trưng. Không bao giờ học.
+2. **Cộng hưởng** (từ ART): các nút mẫu. Học = chỉ kéo nút thắng cuộc lại gần ảnh; ảnh lạ quá thì
+   **mọc nút mới**. Không gì bị ghi đè.
+3. **Nội môi** (từ Ashby): theo dõi một "biến thiết yếu", là tỉ lệ đoán sai **ở những chữ số mình tưởng đã biết**.
+   Đoán sai chữ số chưa từng học là chuyện bình thường (điều mới), không tính. Tỉ lệ này vượt 50% trong 20 lần
+   gần nhất tức là "thế giới đã khác". Khi đó mạng **nhảy nấc**: thử các bộ nhớ ngữ cảnh đã cất trên 10 ảnh gần
+   nhất, bộ nào đúng ≥ 50% thì dùng lại; không bộ nào được thì mở ngữ cảnh mới. Ngữ cảnh cũ **cất đi chứ không xoá**.
+
+Không có backprop. Mỗi ảnh chỉ được xem một lần. Mạng tự mọc nút và tự mở ngữ cảnh khi cần.
+
+**Dòng dữ liệu** (mỗi pha 800 ảnh, mỗi ảnh: đoán trước, rồi được biết đáp án rồi mới học):
+
+| Pha | Chuyện gì xảy ra | Thử khả năng gì |
+|---|---|---|
+| 1 | Chỉ có chữ số 0–4 | Học nhanh |
+| 2 | Chỉ có chữ số 5–9 | Học lớp mới mà không quên |
+| 3 | Cả 10 chữ số, ảnh bị **đảo màu** | Cảm biến hỏng |
+| 4 | Ảnh bình thường nhưng **nhãn lệch 3** (ảnh chữ 2 phải trả lời 5) | Luật đổi, kiến thức cũ thành sai |
+| 5 | Mọi thứ **trở lại bình thường** | Còn nhớ cách cũ không? |
+
+![TN6](ketqua/tn6_mang_lai.png)
+
+| Mô hình | Cả dòng | Pha 1 | Pha 2 | Pha 3 | Pha 4 | Pha 5 | 100 ảnh đầu pha 5 |
+|---|---|---|---|---|---|---|---|
+| MLP trực tuyến (backprop, bộ đệm 500 ảnh) | 78,9% | 94,3 | 86,6 | 64,6 | 83,9 | 65,3 | 5,4 |
+| Hồ chứa + RLS | 83,2% | 98,0 | 94,7 | 90,1 | 79,5 | 53,5 | 9,6 |
+| Fuzzy ARTMAP | 74,3% | 97,8 | 92,3 | 92,4 | 22,1 | 67,0 | 62,2 |
+| HCN bỏ phần nội môi | 75,0% | 98,0 | 94,2 | 91,7 | 40,9 | 50,2 | 38,4 |
+| HCN bỏ phần hồ chứa | **95,3%** | 98,0 | 94,9 | 93,6 | 93,4 | 96,7 | 85,6 |
+| **HCN đầy đủ** | **94,8%** | 98,0 | 94,7 | 91,2 | 93,5 | 96,6 | 84,0 |
+
+(5 seed, độ lệch chuẩn cả dòng ≤ 0,4 điểm. HCN đầy đủ dùng 514 nút và 2,8 ngữ cảnh; bỏ hồ chứa thì cần 796 nút.)
+
+**Đọc kết quả**
+- MLP chịu thiệt nhất ở mỗi lần thế giới đổi: gần như về 0% rồi phải học lại từ đầu, kể cả khi thế giới
+  **quay về đúng như cũ** (pha 5 bắt đầu chỉ đúng 5%).
+- ARTMAP không quên, nhưng **không bỏ được** kiến thức đã sai: ở pha 4 (nhãn lệch) các nút cũ cứ thắng
+  với nhãn cũ, chỉ đúng 22%.
+- HCN đầy đủ: khi nhãn lệch, sau khoảng 10–20 ảnh nó nhận ra "thế giới đã khác" và mở ngữ cảnh mới. Khi
+  mọi thứ trở lại bình thường, nó **nhận ra ngữ cảnh cũ và dùng lại ngay**: 84% ngay trong 100 ảnh đầu,
+  so với 5% của MLP.
+- Thí nghiệm bỏ từng phần cho thấy **phần nội môi là mấu chốt** (bỏ đi thì còn 75%). Còn phần hồ chứa
+  **không giúp tăng độ chính xác** ở bài ảnh tĩnh này; nó chỉ giúp mạng gọn hơn (514 so với 796 nút).
+  Hồ chứa phát huy ở dữ liệu chuỗi thời gian (TN2); với ảnh tĩnh có thể bỏ.
+- Lưu ý công bằng: bộ chữ số chỉ có ~1.800 ảnh nên dòng dữ liệu có ảnh lặp lại, điều này có lợi cho các mô
+  hình "nhớ mẫu" như ART/HCN. Cơ chế nhảy nấc ở đây chọn ngữ cảnh tốt nhất chứ không nhảy ngẫu nhiên hoàn
+  toàn như máy của Ashby. Chưa thử trên dữ liệu lớn.
+
 ---
 
 ## Kết luận
@@ -204,11 +278,9 @@ thì dày lên, tới cống bị đoán sai thì mỏng đi, ống không dùng
 Ngược lại, backprop thắng khi dữ liệu cố định, trộn đều và có hàm lỗi trơn (TN5, hiệu quả mẫu ở TN3).
 Nó thua khi thế giới **thay đổi sau khi đã học xong**: bị quên (TN1), bị đóng băng hoặc mất tính dẻo (TN4).
 
-**Gợi ý cho "một dạng neural network khác"**, ghép ba phần đã thắng:
-hồ chứa (động lực học cố định, giàu biểu diễn) → lớp nút kiểu ART (mọc thêm, không ghi đè) →
-bộ giám sát nội môi (khi sai số vượt vùng cho phép thì xáo lại một phần hồ chứa hoặc mọc nút mới).
-Mạng như vậy học trực tuyến từng mẫu, không cần backprop, và không quên. Bài thử phù hợp nhất:
-dòng dữ liệu thay đổi theo thời gian.
+**Mạng lai HCN (TN6)** ghép ba phần đã thắng và đạt 94,8% trên dòng dữ liệu thay đổi, so với 78,9%
+của MLP học trực tuyến. Bước tiếp theo nên là thử HCN trên dữ liệu chuỗi thời gian thật (nơi phần hồ chứa
+phát huy) và trên bộ dữ liệu lớn hơn.
 
 ## Chạy lại
 
@@ -221,6 +293,7 @@ python3 tn2_chuoi_hon_loan.py    # lâu nhất (~1 giờ trên CPU 4 nhân, ch�
 python3 tn3_tien_hoa.py          # ~10 phút
 python3 tn4_can_bang_noi_moi.py  # ~10 phút
 python3 tn5_physarum.py          # ~1 phút
+python3 tn6_mang_lai.py          # ~5 phút
 # hoặc: python3 chay_tat_ca.py
 ```
 
@@ -232,4 +305,5 @@ jax 0.10, optax 0.2.8, neat-python 2.0.
 | `chung.py` | MLP học bằng backprop (JAX + Adam), tiện ích lưu kết quả |
 | `moi_truong.py` | Con lắc ngược + các kiểu "hỏng" (đảo cực động cơ, lắp ngược cảm biến góc) |
 | `neat_config.ini` | Cấu hình NEAT |
-| `tn1_…` → `tn5_…` | Năm thí nghiệm |
+| `tn1_…` → `tn5_…` | Năm thí nghiệm so sánh từng mô hình |
+| `tn6_mang_lai.py` | Mạng lai HCN và dòng dữ liệu thay đổi |
