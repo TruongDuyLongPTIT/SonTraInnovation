@@ -1,0 +1,260 @@
+{
+  "đầy đủ | NEAT (truyền thẳng)": {
+    "diem_cuoi_100_tap": [
+      499.22200000000004,
+      1.5559999999999945
+    ],
+    "so_seed_dat_475": "5/5",
+    "buoc_den_khi_dat (seed đạt)": [
+      39937.8,
+      23081.48492970069
+    ],
+    "tham_so": [
+      5.0,
+      0.0
+    ],
+    "kich_thuoc_chi_tiet": [
+      {
+        "nut_an": 0,
+        "ket_noi": 4,
+        "tham_so": 5,
+        "ket_noi_giua_nut_trong": 0
+      },
+      {
+        "nut_an": 0,
+        "ket_noi": 4,
+        "tham_so": 5,
+        "ket_noi_giua_nut_trong": 0
+      },
+      {
+        "nut_an": 0,
+        "ket_noi": 4,
+        "tham_so": 5,
+        "ket_noi_giua_nut_trong": 0
+      },
+      {
+        "nut_an": 0,
+        "ket_noi": 4,
+        "tham_so": 5,
+        "ket_noi_giua_nut_trong": 0
+      },
+      {
+        "nut_an": 0,
+        "ket_noi": 4,
+        "tham_so": 5,
+        "ket_noi_giua_nut_trong": 0
+      }
+    ],
+    "giay": [
+      4.1763485524000314,
+      0.5353176879378535
+    ]
+  },
+  "đầy đủ | PPO + MLP": {
+    "diem_cuoi_100_tap": [
+      500.0,
+      0.0
+    ],
+    "so_seed_dat_475": "5/5",
+    "buoc_den_khi_dat (seed đạt)": [
+      22528.0,
+      4096.0
+    ],
+    "tham_so": [
+      9155.0,
+      0.0
+    ],
+    "kich_thuoc_chi_tiet": [
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      }
+    ],
+    "giay": [
+      45.97058649579994,
+      1.0440903940058677
+    ]
+  },
+  "ẩn vận tốc | NEAT (hồi quy)": {
+    "diem_cuoi_100_tap": [
+      219.51200000000003,
+      212.38720200614728
+    ],
+    "so_seed_dat_475": "1/5",
+    "buoc_den_khi_dat (seed đạt)": [
+      280839.0,
+      0.0
+    ],
+    "tham_so": [
+      5.8,
+      2.481934729198171
+    ],
+    "kich_thuoc_chi_tiet": [
+      {
+        "nut_an": 1,
+        "ket_noi": 3,
+        "tham_so": 5,
+        "ket_noi_giua_nut_trong": 2
+      },
+      {
+        "nut_an": 0,
+        "ket_noi": 3,
+        "tham_so": 4,
+        "ket_noi_giua_nut_trong": 1
+      },
+      {
+        "nut_an": 1,
+        "ket_noi": 5,
+        "tham_so": 7,
+        "ket_noi_giua_nut_trong": 2
+      },
+      {
+        "nut_an": 0,
+        "ket_noi": 2,
+        "tham_so": 3,
+        "ket_noi_giua_nut_trong": 1
+      },
+      {
+        "nut_an": 3,
+        "ket_noi": 6,
+        "tham_so": 10,
+        "ket_noi_giua_nut_trong": 4
+      }
+    ],
+    "giay": [
+      4.350949569400018,
+      0.5262465317991131
+    ]
+  },
+  "ẩn vận tốc | PPO + MLP": {
+    "diem_cuoi_100_tap": [
+      42.938,
+      1.2723270019928064
+    ],
+    "so_seed_dat_475": "0/5",
+    "buoc_den_khi_dat (seed đạt)": null,
+    "tham_so": [
+      8899.0,
+      0.0
+    ],
+    "kich_thuoc_chi_tiet": [
+      {
+        "tham_so": 8899
+      },
+      {
+        "tham_so": 8899
+      },
+      {
+        "tham_so": 8899
+      },
+      {
+        "tham_so": 8899
+      },
+      {
+        "tham_so": 8899
+      }
+    ],
+    "giay": [
+      39.311953730800084,
+      0.6696193802500376
+    ]
+  },
+  "ẩn vận tốc | PPO + MLP + chồng 2 khung": {
+    "diem_cuoi_100_tap": [
+      498.122,
+      3.7559999999999945
+    ],
+    "so_seed_dat_475": "5/5",
+    "buoc_den_khi_dat (seed đạt)": [
+      51200.0,
+      11217.357977705802
+    ],
+    "tham_so": [
+      9155.0,
+      0.0
+    ],
+    "kich_thuoc_chi_tiet": [
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      },
+      {
+        "tham_so": 9155
+      }
+    ],
+    "giay": [
+      41.38042802319997,
+      3.661583709408246
+    ]
+  },
+  "ẩn vận tốc | NEAT (hồi quy), ngân sách 1 triệu bước (phụ)": {
+    "diem_cuoi_100_tap": [
+      307.0,
+      221.79247065669296
+    ],
+    "so_seed_dat_475": "3/5",
+    "buoc_den_khi_dat (seed đạt)": [
+      550334.6666666666,
+      206943.476170561
+    ],
+    "tham_so": [
+      8.8,
+      1.469693845669907
+    ],
+    "kich_thuoc_chi_tiet": [
+      {
+        "nut_an": 2,
+        "ket_noi": 5,
+        "tham_so": 8,
+        "ket_noi_giua_nut_trong": 3
+      },
+      {
+        "nut_an": 1,
+        "ket_noi": 6,
+        "tham_so": 8,
+        "ket_noi_giua_nut_trong": 3
+      },
+      {
+        "nut_an": 1,
+        "ket_noi": 5,
+        "tham_so": 7,
+        "ket_noi_giua_nut_trong": 2
+      },
+      {
+        "nut_an": 2,
+        "ket_noi": 7,
+        "tham_so": 10,
+        "ket_noi_giua_nut_trong": 5
+      },
+      {
+        "nut_an": 4,
+        "ket_noi": 6,
+        "tham_so": 11,
+        "ket_noi_giua_nut_trong": 5
+      }
+    ],
+    "giay": [
+      13.05269156839986,
+      2.837304522635181
+    ]
+  }
+}

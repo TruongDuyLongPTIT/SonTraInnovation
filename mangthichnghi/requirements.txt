@@ -1,0 +1,6 @@
+numpy>=2.0
+scikit-learn>=1.5
+matplotlib>=3.8
+jax>=0.4.30
+optax>=0.2
+neat-python>=2.0

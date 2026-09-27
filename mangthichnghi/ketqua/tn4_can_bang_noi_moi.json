@@ -1,0 +1,98 @@
+{
+  "hoc_tu_dau (hệ lành)": {
+    "Homeostat": {
+      "so_seed_hoi_phuc": "5/5",
+      "buoc": [
+        3986.2,
+        1116.0830435052762
+      ]
+    },
+    "PPO + MLP": {
+      "so_seed_hoi_phuc": "5/5",
+      "buoc": [
+        22528.0,
+        4096.0
+      ]
+    },
+    "Homeostat: điểm kiểm tra": [
+      451.512,
+      58.17926276604062
+    ],
+    "PPO: điểm kiểm tra": [
+      500.0,
+      0.0
+    ]
+  },
+  "dao_motor": {
+    "PPO đóng băng: điểm sau hỏng": [
+      8.78,
+      0.04147288270665533
+    ],
+    "PPO học tiếp: hồi phục": {
+      "so_seed_hoi_phuc": "5/5",
+      "buoc": [
+        24985.6,
+        6780.086418328309
+      ]
+    },
+    "PPO học tiếp: điểm cuối": [
+      495.51599999999996,
+      8.968000000000005
+    ],
+    "Homeostat: điểm ngay sau hỏng": [
+      8.914000000000001,
+      0.1594490514239583
+    ],
+    "Homeostat: hồi phục": {
+      "so_seed_hoi_phuc": "5/5",
+      "buoc": [
+        6943.6,
+        3642.9413720234365
+      ]
+    },
+    "Homeostat: số lần nhảy nấc": [
+      66.0,
+      47.81213235152768
+    ],
+    "Homeostat: điểm sau hồi phục": [
+      499.52,
+      0.9599999999999909
+    ]
+  },
+  "dao_cam_bien_goc": {
+    "PPO đóng băng: điểm sau hỏng": [
+      8.785999999999998,
+      0.030724582991474562
+    ],
+    "PPO học tiếp: hồi phục": {
+      "so_seed_hoi_phuc": "2/5",
+      "buoc": [
+        35840.0,
+        15360.0
+      ]
+    },
+    "PPO học tiếp: điểm cuối": [
+      251.86599999999999,
+      219.50358480899575
+    ],
+    "Homeostat: điểm ngay sau hỏng": [
+      8.895999999999999,
+      0.15186836405255671
+    ],
+    "Homeostat: hồi phục": {
+      "so_seed_hoi_phuc": "5/5",
+      "buoc": [
+        5919.0,
+        3341.5787885369396
+      ]
+    },
+    "Homeostat: số lần nhảy nấc": [
+      56.8,
+      61.24181577974317
+    ],
+    "Homeostat: điểm sau hồi phục": [
+      488.98400000000004,
+      22.031999999999993
+    ]
+  }
+}
