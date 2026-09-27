@@ -12,6 +12,7 @@ mà lý thuyết cho là **điểm mạnh** của nó, rồi so với mạng nơ
 | 4 | Homeostat siêu ổn định | Điều khiển học (Ashby, *Design for a Brain*) | Tự hồi phục khi hệ bị hỏng, không cần mục tiêu hay mô hình |
 | 5 | Mạng dòng chảy Physarum có thưởng | Nấm nhầy (Tero et al.) + luật 3 yếu tố | Ý tưởng mới, thử xem có dùng được không |
 | 6 | **Mạng lai HCN** (Hồ chứa – Cộng hưởng – Nội môi) | Ghép 1 + 2 + 4 | Dòng dữ liệu thay đổi liên tục |
+| 7, 8 | HCN trên dữ liệu thật | MNIST, Fashion-MNIST, 3 luồng dữ liệu chuẩn | So thẳng với MLP ở quy mô lớn hơn |
 
 ## Các bài toán này thực chất là gì? (đọc phần này trước)
 
@@ -28,10 +29,28 @@ mà mạng nơ-ron *thường* gặp khó khi triển khai thật: thế giới 
 | 4 | Như TN3, nhưng đang giữ tốt thì **hỏng**: động cơ bị nối ngược dây, hoặc cảm biến góc bị lắp ngược. | Robot bị va đập, thiết bị bị lắp sai khi bảo trì. | Mất bao lâu để tự giữ lại được gậy. |
 | 5 | Nhận chữ số viết tay bình thường (dữ liệu trộn đều, học bao nhiêu lượt cũng được). | Bài phân loại "sách giáo khoa". | % đoán đúng. Đây là sân nhà của mạng nơ-ron. |
 | 6 | Một **dòng** ảnh chữ số liên tục thay đổi (chi tiết ở TN6). Mỗi ảnh: đoán trước, rồi mới được biết đáp án. | Hệ thống chạy thật, luôn học trong lúc làm việc. | % đoán đúng suốt dòng dữ liệu. |
+| 7 | Dữ liệu thật đến theo thời gian: giá điện, loại rừng, mưa hay không. Đoán trước, học sau. | Đúng như tên. | % đoán đúng suốt luồng. |
+| 8 | Bài 1, 5, 6 làm lại trên ảnh thật lớn gấp ~35 lần: chữ số viết tay (MNIST) và ảnh quần áo (Fashion-MNIST). | Nhận dạng ảnh. | % đoán đúng. |
 
 "Mạng nơ-ron" trong các thí nghiệm là: **MLP** (mạng nhiều lớp thông thường) ở TN1, TN5, TN6; **LSTM**
 (mạng có trí nhớ, chuẩn cho chuỗi thời gian) ở TN2; **PPO** (thuật toán học tăng cường phổ biến nhất,
 dùng MLP) ở TN3, TN4. Tất cả học bằng backprop + Adam, là cách huấn luyện chuẩn hiện nay.
+
+## "Mô hình nhớ mẫu" là gì?
+
+Có hai cách lớn để một cỗ máy "học":
+
+| | **Nén thành quy luật** (MLP, LSTM, mọi mạng nơ-ron học bằng backprop) | **Nhớ mẫu** (1-NN, kNN, ART, HCN) |
+|---|---|---|
+| Học là gì | Chỉnh hàng trăm nghìn trọng số cho đến khi mạng tự rút ra quy luật. Ảnh gốc bị vứt đi. | Cất lại các ví dụ (hoặc "ví dụ đại diện" gọi là nút mẫu) vào bộ nhớ. |
+| Đoán thế nào | Đưa ảnh qua các phép tính của mạng. | Tìm trong bộ nhớ ví dụ **giống nhất**, trả lời nhãn của nó ("cái này trông giống con 7 mình từng thấy"). |
+| Ví dụ đời thường | Học sinh hiểu **công thức**, gặp bài lạ vẫn làm được. | Học sinh **thuộc lòng lời giải mẫu**, gặp bài giống thì làm được ngay. |
+| Mạnh ở | Tổng quát hoá, gọn (bộ nhớ nhỏ), đoán rất nhanh. | Học tức thì từ 1 ví dụ; thêm cái mới **không làm hỏng** cái cũ; dễ giải thích ("vì giống ví dụ số 1234"). |
+| Yếu ở | Học cái mới thì đè lên cái cũ (quên); cần học nhiều lượt. | Bộ nhớ phình to; đoán chậm khi nhớ nhiều; kém khi phải tổng quát hoá xa khỏi ví dụ đã thấy. |
+
+ART và HCN thuộc nhóm nhớ mẫu nhưng **có nén**: chúng không nhớ từng ví dụ mà gộp các ví dụ giống nhau
+thành một nút, chỉ mọc nút mới khi gặp cái đủ lạ. Vì vậy khi so sánh, luôn phải đặt cạnh một mô hình nhớ
+mẫu "thô" (1-NN, kNN) để biết phần hơn đến từ ý tưởng mới hay chỉ từ việc nhớ nhiều.
 
 ## Cách làm để so sánh công bằng
 
@@ -53,7 +72,11 @@ dùng MLP) ở TN3, TN4. Tất cả học bằng backprop + Adam, là cách hu�
 | 3 | Con lắc ngược, không dùng gradient | NEAT: mạng **5 tham số**, chạy 4 s | PPO: 9.155 tham số, 46 s, nhưng cần ít bước hơn và ổn định hơn | ➖ **Hoà**: gọn hơn nhưng kém tin cậy |
 | 4 | Tự hồi phục khi hệ bị hỏng | Homeostat: hồi phục 5/5, **~6–7 nghìn bước** | PPO học tiếp: 5/5 và 2/5, 25–36 nghìn bước; đóng băng: 0/5 | ✅ **Thắng** (mới thử với bộ điều khiển nhỏ) |
 | 5 | Phân loại chữ số (ý tưởng mới) | Physarum: 87,5% | MLP 97,4% | ❌ **Thua** |
-| 6 | Dòng dữ liệu đổi 4 lần (5 pha) | **Mạng lai HCN: 94,8%** | MLP trực tuyến 78,9% | ✅ **Thắng rõ** |
+| 6 | Dòng dữ liệu đổi 4 lần (5 pha), bộ chữ số nhỏ | **Mạng lai HCN: 94,5%** | MLP trực tuyến 78,9% | ✅ **Thắng rõ** |
+| 8B | Học liên tục trên MNIST / Fashion-MNIST | **HCN 96,5% / 79,9%** | MLP + phát lại 85,2% / 68,7% | ✅ **Thắng rõ** |
+| 8A | Học bình thường MNIST / Fashion | HCN 96,4% / 84,5% | **MLP 97,9% / 88,9%** | ❌ Thua |
+| 8C | Dòng thay đổi MNIST / Fashion | HCN 92,6% / 79,7% | MLP 91,5% / **82,9%** | ➖ Hoà |
+| 7 | 3 luồng dữ liệu thật (điện, rừng, thời tiết) | HCN 76,1 / 90,8 / 70,2% | **MLP 79,5 / 91,5 / 78,6%** | ❌ Thua |
 
 ---
 
@@ -238,11 +261,12 @@ Không có backprop. Mỗi ảnh chỉ được xem một lần. Mạng tự m�
 | MLP trực tuyến (backprop, bộ đệm 500 ảnh) | 78,9% | 94,3 | 86,6 | 64,6 | 83,9 | 65,3 | 5,4 |
 | Hồ chứa + RLS | 83,2% | 98,0 | 94,7 | 90,1 | 79,5 | 53,5 | 9,6 |
 | Fuzzy ARTMAP | 74,3% | 97,8 | 92,3 | 92,4 | 22,1 | 67,0 | 62,2 |
-| HCN bỏ phần nội môi | 75,0% | 98,0 | 94,2 | 91,7 | 40,9 | 50,2 | 38,4 |
-| HCN bỏ phần hồ chứa | **95,3%** | 98,0 | 94,9 | 93,6 | 93,4 | 96,7 | 85,6 |
-| **HCN đầy đủ** | **94,8%** | 98,0 | 94,7 | 91,2 | 93,5 | 96,6 | 84,0 |
+| HCN bỏ phần nội môi | 75,0% | 98,0 | 94,2 | 91,7 | 40,8 | 50,0 | 38,8 |
+| HCN bỏ phần hồ chứa | **95,1%** | 98,0 | 94,9 | 93,6 | 93,2 | 95,7 | 80,4 |
+| **HCN đầy đủ** | **94,5%** | 98,0 | 94,2 | 91,5 | 93,3 | 95,3 | 80,6 |
 
-(5 seed, độ lệch chuẩn cả dòng ≤ 0,4 điểm. HCN đầy đủ dùng 514 nút và 2,8 ngữ cảnh; bỏ hồ chứa thì cần 796 nút.)
+(5 seed, độ lệch chuẩn cả dòng ≤ 0,4 điểm. HCN đầy đủ dùng ~500 nút và 2 ngữ cảnh; bỏ hồ chứa thì cần ~800 nút.
+Số liệu là của **bản HCN cuối cùng** trong `hcn.py`, bản đã sửa khi thử trên dữ liệu lớn ở TN8, xem bên dưới.)
 
 **Đọc kết quả**
 - MLP chịu thiệt nhất ở mỗi lần thế giới đổi: gần như về 0% rồi phải học lại từ đầu, kể cả khi thế giới
@@ -250,14 +274,90 @@ Không có backprop. Mỗi ảnh chỉ được xem một lần. Mạng tự m�
 - ARTMAP không quên, nhưng **không bỏ được** kiến thức đã sai: ở pha 4 (nhãn lệch) các nút cũ cứ thắng
   với nhãn cũ, chỉ đúng 22%.
 - HCN đầy đủ: khi nhãn lệch, sau khoảng 10–20 ảnh nó nhận ra "thế giới đã khác" và mở ngữ cảnh mới. Khi
-  mọi thứ trở lại bình thường, nó **nhận ra ngữ cảnh cũ và dùng lại ngay**: 84% ngay trong 100 ảnh đầu,
+  mọi thứ trở lại bình thường, nó **nhận ra ngữ cảnh cũ và dùng lại ngay**: 81% ngay trong 100 ảnh đầu,
   so với 5% của MLP.
 - Thí nghiệm bỏ từng phần cho thấy **phần nội môi là mấu chốt** (bỏ đi thì còn 75%). Còn phần hồ chứa
-  **không giúp tăng độ chính xác** ở bài ảnh tĩnh này; nó chỉ giúp mạng gọn hơn (514 so với 796 nút).
+  **không giúp tăng độ chính xác** ở bài ảnh tĩnh này; nó chỉ giúp mạng gọn hơn (~500 so với ~800 nút).
   Hồ chứa phát huy ở dữ liệu chuỗi thời gian (TN2); với ảnh tĩnh có thể bỏ.
 - Lưu ý công bằng: bộ chữ số chỉ có ~1.800 ảnh nên dòng dữ liệu có ảnh lặp lại, điều này có lợi cho các mô
   hình "nhớ mẫu" như ART/HCN. Cơ chế nhảy nấc ở đây chọn ngữ cảnh tốt nhất chứ không nhảy ngẫu nhiên hoàn
-  toàn như máy của Ashby. Chưa thử trên dữ liệu lớn.
+  toàn như máy của Ashby. Phần thử trên dữ liệu lớn ở TN7, TN8.
+
+---
+
+## TN7, TN8 · HCN trên dữ liệu thật, lớn hơn
+
+Chạy bản HCN chung (`hcn.py`) trên dữ liệu thật, so với MLP học bằng backprop.
+
+**Trung thực về cách làm:** khi chuyển sang MNIST, HCN lộ ra 3 lỗi thiết kế, tôi đã sửa từng cái:
+1. Ngân sách nút đầy thì xoá nút lâu không dùng. Đó chính là nút của lớp cũ, tức tự cài cơ chế quên
+   → đổi thành hạn mức ngang nhau cho mỗi lớp.
+2. Bộ nội môi báo động nhầm khi đang học lớp mới → đổi thành "sai **nhiều hơn hẳn** mức thường ngày của
+   chính lớp đó (hơn 40 điểm %)".
+3. Lúc chọn ngữ cảnh, ngữ cảnh hiện tại vừa học chính các mẫu dùng để chấm nên luôn thắng → loại nó ra.
+
+Các sửa đổi đó được thử trên **MNIST và bộ chữ số nhỏ**, nên kết quả MNIST có phần "đã nhìn đề".
+**Fashion-MNIST, Covertype và Thời tiết không hề được dùng khi sửa**: đó là bài kiểm tra thật sự.
+Riêng với luồng Điện, tôi có xem 10.000 mẫu đầu.
+
+### TN8 · Ảnh: MNIST (chữ số viết tay) và Fashion-MNIST (ảnh quần áo, giày, túi)
+
+`tn8_anh_that.py` · Mỗi bộ 60.000 ảnh học + 10.000 ảnh kiểm tra, 28×28 điểm ảnh, 10 lớp. 3 seed.
+Với ảnh, HCN dùng thẳng điểm ảnh (tắt hồ chứa), ngân sách 20.000 nút.
+
+![TN8](ketqua/tn8_anh_that.png)
+
+| Bài | Mô hình | MNIST | Fashion-MNIST *(chưa dùng khi sửa)* |
+|---|---|---|---|
+| **A. Học bình thường** (sân nhà MLP) | MLP, 10 lượt | **97,9%** | **88,9%** |
+| | MLP, 1 lượt | 96,2% | 85,0% |
+| | HCN, 1 lượt | 96,4% | 84,5% |
+| | *1-NN nhớ hết 60.000 ảnh* | *97,2%* | *85,8%* |
+| **B. Học liên tục** (5 đợt × 2 lớp) | MLP tuần tự | 20,5% | 19,5% |
+| | MLP + phát lại 100 ảnh/lớp | 85,2% | 68,7% |
+| | **HCN, 1 lượt** | **96,5%** | **79,9%** |
+| **C. Dòng thay đổi** (5 pha × 6.000 ảnh) | MLP trực tuyến | 91,5% | **82,9%** |
+| | HCN bỏ nội môi | 71,7% | 63,0% |
+| | HCN đầy đủ | **92,6%** | 79,7% |
+| C: 500 ảnh đầu khi **trở lại bình thường** | MLP trực tuyến | 39% | 38% |
+| | HCN đầy đủ | **94%** | **82%** |
+
+Chi phí: HCN học 1 lượt MNIST mất ~5 phút và giữ 20.000 nút (15,7 triệu số), trong khi MLP mất ~8 giây
+với 269.000 tham số. HCN đắt gấp ~60 lần về bộ nhớ.
+
+### TN7 · Luồng dữ liệu thật của ngành học trực tuyến
+
+`tn7_luong_that.py` · Ba bộ dữ liệu chuẩn, chạy đúng thứ tự thời gian, đoán trước rồi học sau:
+- **Điện** (Elec2): 45.312 lần ghi, giá điện ở Úc sẽ tăng hay giảm.
+- **Covertype**: 100.000 ô đất ở Colorado, thuộc loại rừng nào (7 loại).
+- **Thời tiết**: 18.159 ngày, ngày mai có mưa không.
+
+Tôi thêm hai mốc để đọc cho đúng: "đoán giống nhãn trước" (không học gì) và **ARF**, loại mạnh nhất hiện nay
+cho học trên luồng dữ liệu (thư viện river). 3 seed.
+
+![TN7](ketqua/tn7_luong_that.png)
+
+| Mô hình | Điện | Covertype | Thời tiết |
+|---|---|---|---|
+| Đoán giống nhãn trước (không học gì) | **85,3%** | 90,6% | 68,0% |
+| kNN cửa sổ (nhớ 1.000 mẫu gần nhất) | 81,9% | 91,2% | 75,6% |
+| ARF (rừng ngẫu nhiên thích nghi) | 85,2% | 91,2% | 78,4% |
+| **MLP trực tuyến (backprop)** | 79,5% | **91,5%** | **78,6%** |
+| HCN | 76,1% | 90,8% | 70,2% |
+
+### Đọc kết quả TN7, TN8
+
+- **HCN thắng rõ ở học liên tục**, cả trên bộ chưa dùng khi sửa: MNIST 96,5% và Fashion 79,9%, so với 85,2%
+  và 68,7% của MLP có phát lại dữ liệu cũ. Đây là điểm mạnh thật, đúng như TN1.
+- **Khi thế giới quay lại đúng như cũ**, HCN nhận ra ngay (94% và 82% trong 500 ảnh đầu, so với 39% và 38%).
+- **Nhưng xét cả dòng thay đổi**, HCN chỉ nhỉnh hơn MLP trên MNIST (92,6 so với 91,5) và **thua trên Fashion**
+  (79,7 so với 82,9). Lý do: khi phải học cái mới (lớp mới, ảnh đảo màu), MLP học nhanh hơn và tổng quát
+  tốt hơn. Cái lợi "nhớ ngữ cảnh cũ" chỉ phát huy khi thế giới thật sự quay lại.
+- **Khi dữ liệu trộn đều** (bài A), MLP thắng, đúng như dự đoán: 97,9 so với 96,4 và 88,9 so với 84,5.
+- **Trên luồng dữ liệu thật, HCN thua cả 3 bộ.** Ở đó thế giới trôi dần chứ không đổi đột ngột rồi quay lại,
+  nên bộ nội môi gần như không bao giờ kích hoạt, và HCN chỉ còn là một mô hình nhớ mẫu kém hơn kNN.
+  Đáng chú ý: ở luồng Điện, "đoán giống nhãn trước" thắng cả ARF lẫn MLP. Luồng này có tính tự tương quan
+  rất mạnh, một cái bẫy đã được biết trong giới học trực tuyến.
 
 ---
 
@@ -278,9 +378,14 @@ Không có backprop. Mỗi ảnh chỉ được xem một lần. Mạng tự m�
 Ngược lại, backprop thắng khi dữ liệu cố định, trộn đều và có hàm lỗi trơn (TN5, hiệu quả mẫu ở TN3).
 Nó thua khi thế giới **thay đổi sau khi đã học xong**: bị quên (TN1), bị đóng băng hoặc mất tính dẻo (TN4).
 
-**Mạng lai HCN (TN6)** ghép ba phần đã thắng và đạt 94,8% trên dòng dữ liệu thay đổi, so với 78,9%
-của MLP học trực tuyến. Bước tiếp theo nên là thử HCN trên dữ liệu chuỗi thời gian thật (nơi phần hồ chứa
-phát huy) và trên bộ dữ liệu lớn hơn.
+**Mạng lai HCN** trên dữ liệu thật (TN7, TN8) cho một bức tranh rõ ràng:
+- **Nên dùng** khi phải học lần lượt nhiều thứ mà không được giữ dữ liệu cũ (hơn MLP 11–12 điểm), hoặc khi
+  môi trường **đổi đột ngột rồi quay lại** các trạng thái cũ.
+- **Không nên dùng** khi dữ liệu trộn đều, hoặc khi thế giới trôi dần (luồng dữ liệu thật). Ở đó MLP
+  (và ARF) tốt hơn, lại rẻ hơn nhiều về bộ nhớ.
+- Điểm yếu gốc rễ: HCN vẫn là mô hình **nhớ mẫu**, nên tổng quát hoá kém hơn mạng nơ-ron. Hướng cải tiến
+  hợp lý nhất: thay phần nút mẫu bằng một **MLP nhỏ cho mỗi ngữ cảnh**, giữ nguyên bộ nội môi để chuyển
+  ngữ cảnh. Như vậy có được khả năng tổng quát của backprop mà vẫn không quên.
 
 ## Chạy lại
 
@@ -294,11 +399,14 @@ python3 tn3_tien_hoa.py          # ~10 phút
 python3 tn4_can_bang_noi_moi.py  # ~10 phút
 python3 tn5_physarum.py          # ~1 phút
 python3 tn6_mang_lai.py          # ~5 phút
+python3 du_lieu_that.py          # tải MNIST, Fashion-MNIST, các luồng dữ liệu (~200 MB, vào dulieu/)
+python3 tn7_luong_that.py        # ~1,5 giờ (HCN trên Covertype chậm)
+python3 tn8_anh_that.py          # ~1,5 giờ
 # hoặc: python3 chay_tat_ca.py
 ```
 
 Kết quả số (JSON) và hình nằm trong `ketqua/`. Phiên bản thư viện đã dùng: numpy 2.4, scikit-learn 1.9,
-jax 0.10, optax 0.2.8, neat-python 2.0.
+jax 0.10, optax 0.2.8, neat-python 2.0, river 0.26.
 
 | File | Nội dung |
 |---|---|
@@ -306,4 +414,7 @@ jax 0.10, optax 0.2.8, neat-python 2.0.
 | `moi_truong.py` | Con lắc ngược + các kiểu "hỏng" (đảo cực động cơ, lắp ngược cảm biến góc) |
 | `neat_config.ini` | Cấu hình NEAT |
 | `tn1_…` → `tn5_…` | Năm thí nghiệm so sánh từng mô hình |
-| `tn6_mang_lai.py` | Mạng lai HCN và dòng dữ liệu thay đổi |
+| `tn6_mang_lai.py` | Mạng lai HCN (bản đầu) và dòng dữ liệu thay đổi |
+| `hcn.py` | Bản HCN cuối cùng, dùng chung cho TN6–TN8 |
+| `du_lieu_that.py` | Tải và đệm dữ liệu thật |
+| `tn7_luong_that.py`, `tn8_anh_that.py` | HCN vs MLP trên dữ liệu thật |

@@ -188,13 +188,16 @@ class HoChuaRLS:
         self.P = (self.P - np.outer(k, Pz)) / self.lam
 
 
+# Bản HCN dùng chung (hcn.py) là bản cuối cùng, cũng dùng ở TN7, TN8. Lớp HCN ở trên là bản đầu tiên, giữ lại để tham khảo.
+from hcn import HCN as HCNChung  # noqa: E402
+
 MO_HINH = {
     "MLP trực tuyến (backprop + bộ đệm)": MLPTrucTuyen,
     "Hồ chứa + RLS": HoChuaRLS,
     "Fuzzy ARTMAP": ARTMAPTrucTuyen,
-    "HCN bỏ nội môi": lambda seed: HCN(seed, noi_moi=False),
-    "HCN bỏ hồ chứa": lambda seed: HCN(seed, ho_chua=False),
-    "HCN (đầy đủ)": HCN,
+    "HCN bỏ nội môi": lambda seed: HCNChung(64, seed=seed, noi_moi=False),
+    "HCN bỏ hồ chứa": lambda seed: HCNChung(64, seed=seed, ho_chua=False, tam=0.5),
+    "HCN (đầy đủ)": lambda seed: HCNChung(64, seed=seed),
 }
 
 
@@ -209,7 +212,7 @@ def chay(seed):
             dung[t] = du == y[t]
             mh.hoc(X[t], y[t], du)
         kq[ten] = {"dung": dung}
-        if isinstance(mh, HCN):
+        if isinstance(mh, HCNChung):
             kq[ten]["so_nut"] = mh.so_nut
             kq[ten]["so_ngu_canh"] = len(mh.cac_ngu_canh)
             kq[ten]["so_lan_nhay"] = mh.so_lan_nhay
